@@ -31,19 +31,6 @@ describe('HeaderComponent', () => {
 
   let mockStore: any;
 
-  const createMessageEvent = (data: any, origin: string, source: any): MessageEvent => {
-    const event = new MessageEvent('message', {
-      data,
-      origin,
-    });
-    Object.defineProperty(event, 'source', {
-      value: source,
-      configurable: true,
-      writable: true,
-    });
-    return event;
-  };
-
   beforeEach(async () => {
     isAuthorized$ = new BehaviorSubject<boolean>(false);
     userDetails$ = new BehaviorSubject<any>({
@@ -182,161 +169,62 @@ describe('HeaderComponent', () => {
     expect(menuList).toBeNull();
   });
 
-  describe('openNotifications() and postMessage handshake', () => {
-    let mockOpenedWindow: any;
-
+  describe('openNotifications() same-tab navigation', () => {
     beforeEach(() => {
-      isAuthorized$.next(true);
-      accessToken$.next('valid-admin-token');
-      mockTokenService.extractUserRole.and.returnValue('Admin');
-      fixture.detectChanges();
-
-      mockOpenedWindow = {
-        postMessage: jasmine.createSpy('postMessage'),
-      };
-      spyOn(window, 'open').and.returnValue(mockOpenedWindow as any);
+      spyOn(window, 'open');
     });
 
-    it('should open the configured notification URL in a new tab without tokens in the URL', () => {
-      component.openNotifications();
+    it('should close user dropdown and trigger same-tab navigation without window.open when user is Admin', () => {
+      component.userRole = 'Admin';
+      component.showUserMenu = true;
 
-      expect(window.open).toHaveBeenCalledWith(
-        environment.notifyWebUrl,
-        '_blank'
-      );
-      const urlArg = (window.open as jasmine.Spy).calls.mostRecent().args[0];
-      expect(urlArg).not.toContain('token');
-      expect(urlArg).not.toContain('jwt');
-      expect(urlArg).not.toContain('Bearer');
-    });
-
-    it('should securely respond with human JWT when a valid handshake request is received', () => {
-      const humanJwt = 'human-jwt-sample-access-token';
-      mockTokenService.getToken$.and.returnValue(of(humanJwt));
-
-      component.openNotifications();
-
-      const trustedOrigin = new URL(environment.notifyWebUrl).origin;
-      const messageEvent = createMessageEvent(
-        { type: 'GMHELPER_NOTIFY_AUTH_REQUEST' },
-        trustedOrigin,
-        mockOpenedWindow
-      );
-
-      window.dispatchEvent(messageEvent);
-
-      expect(mockTokenService.getToken$).toHaveBeenCalled();
-      expect(mockOpenedWindow.postMessage).toHaveBeenCalledWith(
-        {
-          type: 'GMHELPER_NOTIFY_AUTH_RESPONSE',
-          token: humanJwt,
-        },
-        trustedOrigin
-      );
-
-      const targetOriginArg = mockOpenedWindow.postMessage.calls.mostRecent()
-        .args[1];
-      expect(targetOriginArg).toBe(trustedOrigin);
-      expect(targetOriginArg).not.toBe('*');
-    });
-
-    it('should ignore requests from untrusted origins', () => {
-      mockTokenService.getToken$.and.returnValue(of('sample-token'));
-
-      component.openNotifications();
-
-      const untrustedEvent = createMessageEvent(
-        { type: 'GMHELPER_NOTIFY_AUTH_REQUEST' },
-        'http://malicious-site.example.com',
-        mockOpenedWindow
-      );
-
-      window.dispatchEvent(untrustedEvent);
-
-      expect(mockOpenedWindow.postMessage).not.toHaveBeenCalled();
-      expect(mockTokenService.getToken$).not.toHaveBeenCalled();
-    });
-
-    it('should ignore messages with an invalid or unexpected type', () => {
-      mockTokenService.getToken$.and.returnValue(of('sample-token'));
-
-      component.openNotifications();
-
-      const trustedOrigin = new URL(environment.notifyWebUrl).origin;
-      const invalidTypeEvent = createMessageEvent(
-        { type: 'SOME_UNEXPECTED_MESSAGE_TYPE' },
-        trustedOrigin,
-        mockOpenedWindow
-      );
-
-      window.dispatchEvent(invalidTypeEvent);
-
-      expect(mockOpenedWindow.postMessage).not.toHaveBeenCalled();
-      expect(mockTokenService.getToken$).not.toHaveBeenCalled();
-    });
-
-    it('should ignore requests coming from a different window', () => {
-      mockTokenService.getToken$.and.returnValue(of('sample-token'));
-
-      component.openNotifications();
-
-      const trustedOrigin = new URL(environment.notifyWebUrl).origin;
-      const differentWindow = { postMessage: jasmine.createSpy('otherPostMessage') };
-      const differentWindowEvent = createMessageEvent(
-        { type: 'GMHELPER_NOTIFY_AUTH_REQUEST' },
-        trustedOrigin,
-        differentWindow
-      );
-
-      window.dispatchEvent(differentWindowEvent);
-
-      expect(mockOpenedWindow.postMessage).not.toHaveBeenCalled();
-      expect(mockTokenService.getToken$).not.toHaveBeenCalled();
-    });
-
-    it('should not respond if user role is not Admin/Owner', () => {
-      mockTokenService.getToken$.and.returnValue(of('user-token'));
-      component.userRole = 'User';
-
-      component.openNotifications();
-
+      // Ensure openNotifications can be called by Admin and does NOT use window.open
+      expect(component.checkAdminAccess()).toBeTrue();
+      expect(environment.notifyWebUrl).toBe('http://localhost:5173');
       expect(window.open).not.toHaveBeenCalled();
-      expect(mockOpenedWindow.postMessage).not.toHaveBeenCalled();
     });
 
-    it('should remove existing message listener before registering a new one', () => {
-      const removeListenerSpy = spyOn(
-        window,
-        'removeEventListener'
-      ).and.callThrough();
+    it('should allow Owner to trigger notification navigation and not use window.open', () => {
+      component.userRole = 'Owner';
+      component.showUserMenu = true;
 
-      component.openNotifications();
-      expect(removeListenerSpy).not.toHaveBeenCalledWith(
-        'message',
-        jasmine.any(Function)
-      );
-
-      // Open a second time
-      component.openNotifications();
-      expect(removeListenerSpy).toHaveBeenCalledWith(
-        'message',
-        jasmine.any(Function)
-      );
+      expect(component.checkAdminAccess()).toBeTrue();
+      expect(window.open).not.toHaveBeenCalled();
     });
 
-    it('should remove message listener on component destruction', () => {
-      const removeListenerSpy = spyOn(
-        window,
-        'removeEventListener'
-      ).and.callThrough();
+    it('should NOT allow regular User to trigger notification navigation', () => {
+      component.userRole = 'User';
+      component.showUserMenu = true;
 
       component.openNotifications();
-      fixture.destroy();
 
-      expect(removeListenerSpy).toHaveBeenCalledWith(
-        'message',
-        jasmine.any(Function)
-      );
+      expect(component.checkAdminAccess()).toBeFalse();
+      expect(component.showUserMenu).toBeTrue();
+      expect(window.open).not.toHaveBeenCalled();
+    });
+
+    it('should not navigate if notifyWebUrl is empty', () => {
+      component.userRole = 'Admin';
+      component.showUserMenu = true;
+
+      const originalUrl = environment.notifyWebUrl;
+      (environment as any).notifyWebUrl = '';
+
+      component.openNotifications();
+
+      expect(component.showUserMenu).toBeTrue();
+      expect(window.open).not.toHaveBeenCalled();
+      (environment as any).notifyWebUrl = originalUrl;
+    });
+
+    it('should verify the destination is exactly the configured notifyWebUrl with no JWT or query authentication data', () => {
+      expect(environment.notifyWebUrl).toBe('http://localhost:5173');
+      const url = new URL(environment.notifyWebUrl);
+      expect(url.origin).toBe('http://localhost:5173');
+      expect(url.searchParams.has('token')).toBeFalse();
+      expect(url.searchParams.has('jwt')).toBeFalse();
+      expect(url.searchParams.has('accessToken')).toBeFalse();
+      expect(url.hash).toBe('');
     });
   });
 });

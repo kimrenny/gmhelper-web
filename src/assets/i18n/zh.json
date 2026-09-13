@@ -99,6 +99,7 @@
   "HEADER": {
     "LIST": {
       "SETTINGS": "设置",
+      "NOTIFICATIONS": "通知",
       "ADMIN": "管理员",
       "OWNER": "所有者",
       "LOGOUT": "退出"

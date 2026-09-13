@@ -1,4 +1,5 @@
-export const environment = {
+﻿export const environment = {
   production: true,
-  apiUrl: 'https://localhost:7057/api/v1',
+  apiUrl: 'http://localhost:7057/api/v1',
+  notifyWebUrl: '',
 };

@@ -99,6 +99,7 @@
   "HEADER": {
     "LIST": {
       "SETTINGS": "설정",
+      "NOTIFICATIONS": "알림",
       "ADMIN": "관리자",
       "OWNER": "소유자",
       "LOGOUT": "로그아웃"

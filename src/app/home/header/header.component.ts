@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, NavigationStart, RouterModule } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { TokenService } from 'src/app/services/token.service';
 import { LanguageService } from 'src/app/services/language.service';
 import { ToastrService } from 'ngx-toastr';
@@ -24,6 +24,7 @@ import * as UserActions from 'src/app/store/user/user.actions';
 import * as AuthActions from 'src/app/store/auth/auth.actions';
 import * as AuthSelectors from 'src/app/store/auth/auth.selectors';
 import * as AuthState from 'src/app/store/auth/auth.state';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -44,6 +45,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showAuthHighlight = true;
 
   private subscriptions = new Subscription();
+
+  private notifyMessageHandler: ((event: MessageEvent) => void) | null = null;
 
   constructor(
     private store: Store<UserState.UserState>,
@@ -109,6 +112,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.notifyMessageHandler) {
+      window.removeEventListener('message', this.notifyMessageHandler);
+      this.notifyMessageHandler = null;
+    }
     this.subscriptions.unsubscribe();
   }
 
@@ -165,6 +172,79 @@ export class HeaderComponent implements OnInit, OnDestroy {
   openUserSettings() {
     this.showUserMenu = false;
     this.router.navigate(['/settings']);
+  }
+
+  openNotifications() {
+    if (!this.checkAdminAccess() || !environment.notifyWebUrl) {
+      return;
+    }
+
+    this.showUserMenu = false;
+
+    let targetOrigin: string;
+    try {
+      targetOrigin = new URL(environment.notifyWebUrl).origin;
+    } catch {
+      return;
+    }
+
+    if (this.notifyMessageHandler) {
+      window.removeEventListener('message', this.notifyMessageHandler);
+      this.notifyMessageHandler = null;
+    }
+
+    const notifyWindow = window.open(environment.notifyWebUrl, '_blank');
+    if (!notifyWindow) {
+      return;
+    }
+
+    const handler = (event: MessageEvent) => {
+      if (event.origin !== targetOrigin) {
+        return;
+      }
+
+      if (event.source !== notifyWindow) {
+        return;
+      }
+
+      if (event.data?.type !== 'GMHELPER_NOTIFY_AUTH_REQUEST') {
+        return;
+      }
+
+      if (!this.checkAdminAccess()) {
+        return;
+      }
+
+      this.tokenService
+        .getToken$()
+        .pipe(take(1))
+        .subscribe({
+          next: (token) => {
+            if (token && event.source) {
+              (event.source as Window).postMessage(
+                {
+                  type: 'GMHELPER_NOTIFY_AUTH_RESPONSE',
+                  token,
+                },
+                targetOrigin
+              );
+            }
+            window.removeEventListener('message', handler);
+            if (this.notifyMessageHandler === handler) {
+              this.notifyMessageHandler = null;
+            }
+          },
+          error: () => {
+            window.removeEventListener('message', handler);
+            if (this.notifyMessageHandler === handler) {
+              this.notifyMessageHandler = null;
+            }
+          },
+        });
+    };
+
+    this.notifyMessageHandler = handler;
+    window.addEventListener('message', handler);
   }
 
   openAdminPanel() {

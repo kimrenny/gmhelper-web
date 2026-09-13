@@ -99,6 +99,7 @@
   "HEADER": {
     "LIST": {
       "SETTINGS": "Настройки",
+      "NOTIFICATIONS": "Уведомления",
       "ADMIN": "Админ",
       "OWNER": "Владелец",
       "LOGOUT": "Выйти"

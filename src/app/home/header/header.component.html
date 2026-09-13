@@ -37,6 +37,9 @@
             <li (click)="openUserSettings()">
               {{ "HEADER.LIST.SETTINGS" | translate }}
             </li>
+            <li *ngIf="checkAdminAccess()" (click)="openNotifications()">
+              {{ "HEADER.LIST.NOTIFICATIONS" | translate }}
+            </li>
             <li *ngIf="checkAdminAccess()" (click)="openAdminPanel()">
               {{ "HEADER.LIST.ADMIN" | translate }}
             </li>

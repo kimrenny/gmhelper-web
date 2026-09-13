@@ -24,6 +24,7 @@ import * as UserActions from 'src/app/store/user/user.actions';
 import * as AuthActions from 'src/app/store/auth/auth.actions';
 import * as AuthSelectors from 'src/app/store/auth/auth.selectors';
 import * as AuthState from 'src/app/store/auth/auth.state';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -165,6 +166,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   openUserSettings() {
     this.showUserMenu = false;
     this.router.navigate(['/settings']);
+  }
+
+  openNotifications() {
+    if (!this.checkAdminAccess() || !environment.notifyWebUrl) {
+      return;
+    }
+
+    this.showUserMenu = false;
+    window.location.href = environment.notifyWebUrl;
   }
 
   openAdminPanel() {

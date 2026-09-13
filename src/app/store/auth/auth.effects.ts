@@ -13,22 +13,7 @@ export class AuthEffects {
   restoreAuth$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.restoreAuthFromStorage),
-      switchMap(() => {
-        const accessToken = localStorage.getItem('authToken');
-
-        if (!accessToken) {
-          return EMPTY;
-        }
-
-        const isExpired = this.tokenService.isTokenExpired(accessToken);
-
-        if (isExpired) {
-          return of(AuthActions.refreshToken());
-        }
-
-        const role = this.tokenService.extractUserRole(accessToken);
-        return of(AuthActions.loginSuccess({ accessToken, role }));
-      })
+      switchMap(() => of(AuthActions.refreshToken()))
     )
   );
 

@@ -23,6 +23,7 @@
       "ES2022",
       "dom"
     ],
+    "types": [],
     "typeRoots": [
       "node_modules/@types",
       "node_modules/katex/types"
@@ -33,5 +34,17 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./cypress/tsconfig.json"
+    }
+  ]
 }

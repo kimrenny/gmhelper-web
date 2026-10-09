@@ -169,7 +169,9 @@
       },
       "ANGLE": {
         "CHANGEMEASUREMENT": "Change the angle measurement"
-      }
+      },
+      "UNDO": "Undo last action",
+      "REDO": "Redo last action"
     },
     "SETTINGS": {
       "SELECT": {
@@ -181,7 +183,7 @@
     "ERRORS": {
       "INVALID_SIDES_NUMBER": "Invalid number of sides. The value must be an integer greater than or equal to 3.",
       "LENGTH": {
-        "INCORRECT": "Invalid line length. Only numbers, 'x', 'y', or '?' are allowed."
+        "INCORRECT": "Invalid line length. Only positive numbers, 'x', 'y', or '?' are allowed."
       },
       "ERROR": {
         "TITLE": "Error",
@@ -196,7 +198,8 @@
         "PLACEHOLDER": {
           "EDIT_DISABLED": "Editing LaTeX code is disabled until all empty fields are filled"
         }
-      }
+      },
+      "INVALID_ANGLE_VALUE": "Angle measure must be between 0° and 180°."
     },
     "EDIT_MODE": {
       "ALERT": "Placeholder editing mode is enabled for the selected element.<br>Please enter a character. If you want to enter more than one character, please use the LaTeX code editor.<br>To exit the editing mode, click the button below or press ESC/Enter.",
@@ -218,7 +221,10 @@
       "CANCEL": "Cancel"
     },
     "SOLUTION": {
-      "RATE": "Rate Solution"
+      "RATE": "Rate Solution",
+      "STEP": "Step",
+      "PROBLEM": "Problem",
+      "FINAL_ANSWER": "Final Answer"
     },
     "PROCESSING": {
       "MESSAGE_1": "Your task is being processed, please wait…",
@@ -241,6 +247,51 @@
       "MESSAGE_18": "Almost there! The system is finalizing your answer.",
       "MESSAGE_19": "Processing in progress… your task will appear shortly.",
       "MESSAGE_20": "Hang tight, the solution is being generated right now."
+    },
+    "LENGTH": {
+      "TITLE": "Set Line Length",
+      "NUM": "NUM",
+      "OK": "OK",
+      "DEL": "DEL"
+    },
+    "ANGLE": {
+      "TITLE": "Set Angle Measure",
+      "OK": "OK",
+      "DEL": "DEL"
+    },
+    "CONDITIONS": {
+      "TITLE": "Conditions & Target",
+      "PROBLEM_SECTION": "Problem Statement",
+      "PROBLEM_HINT": "Enter the geometry problem text directly (drawing is optional)",
+      "PROBLEM_PLACEHOLDER": "e.g. In triangle ABC, AB = 5, BC = 5, AC = 6. The angle ABC is 60 degrees. Find the altitude BH to AC.",
+      "SAVE_PROBLEM": "Save Problem",
+      "CLEAR_PROBLEM": "Clear",
+      "CURRENT_PROBLEM": "Current Problem Statement",
+      "PROBLEM_SAVED": "Problem statement saved successfully",
+      "TARGET_SECTION": "Target (What to find)",
+      "TARGET_HINT": "Specify what needs to be calculated or proved",
+      "TARGET_PLACEHOLDER": "e.g. Find AB, Find ∠ABC, Find area of triangle ABC",
+      "SAVE_TARGET": "Save Target",
+      "CLEAR_TARGET": "Clear",
+      "CURRENT_TARGET": "Current Target",
+      "TARGET_SAVED": "Target saved successfully",
+      "ADDITIONAL_SECTION": "Additional Conditions",
+      "ADDITIONAL_HINT": "Enter arbitrary geometric conditions as plain text",
+      "ADDITIONAL_PLACEHOLDER": "e.g. AB is parallel to CD, AB = BC, O is midpoint of AC",
+      "ADD_BUTTON": "Add",
+      "EDIT_BUTTON": "Edit condition",
+      "DELETE_BUTTON": "Delete condition",
+      "SAVE_EDIT": "Save",
+      "CANCEL_EDIT": "Cancel",
+      "NO_CONDITIONS": "No additional conditions added yet",
+      "FIGURE_CONSTRAINTS": "Figure Constraints",
+      "FIGURE_CONSTRAINTS_HINT": "Click directly on segments or angles on the canvas to set geometric constraints",
+      "LINES_SUMMARY": "Line Lengths",
+      "ANGLES_SUMMARY": "Angle Measures",
+      "NO_LINE_CONSTRAINTS": "No line length constraints set",
+      "NO_ANGLE_CONSTRAINTS": "No angle constraints set",
+      "DONE": "Done",
+      "CLOSE": "Close"
     }
   },
   "REGISTER": {
@@ -782,71 +833,50 @@
   "PRIVACY": {
     "TITLE": "Privacy Policy",
     "INTRO": "This Privacy Policy explains how we collect, use, and protect your personal information when you use our application.",
-
     "COLLECTED_DATA": "Collected Data",
     "COLLECTED_DATA_TEXT": "We collect various types of information from you, including your email address, login credentials, geolocation data, and user-provided images (avatars). This helps us personalize your experience and provide our services effectively.",
-
     "USE_OF_DATA": "Use of Data",
     "USE_OF_DATA_TEXT": "Your data is used to operate and improve the application, including enabling account management, customizing content, providing customer support, analyzing usage trends, and ensuring compliance with applicable laws.",
-
     "DATA_SHARING": "Data Sharing",
     "DATA_SHARING_TEXT": "We do not sell your personal data. We only share it with third parties where strictly necessary for technical purposes (e.g., determining location by IP for localization, hosting, analytics).",
-
     "STORAGE_DURATION": "Storage Duration",
     "STORAGE_DURATION_TEXT": "We store your data only for as long as it is necessary to provide our services or as required by law. You can request deletion of your data at any time.",
-
     "INTERNATIONAL": "International Data Transfers",
     "INTERNATIONAL_TEXT": "Your information may be stored and processed on servers located outside your country of residence. By using the application, you consent to such transfers, which may be subject to different data protection laws.",
-
     "COOKIES": "Cookies and Authentication",
     "COOKIES_TEXT": "GMHelper uses cookies to maintain user sessions and enable secure authentication. These cookies store information such as refresh tokens, which are necessary for logging in and keeping your session active. You can manage cookies in your browser settings, but disabling them may prevent you from using certain features.",
-
     "USER_RIGHTS": "Your Rights",
     "USER_RIGHTS_TEXT": "You have the right to access, correct, or delete your personal data. You can also withdraw consent for processing at any time. To exercise these rights, contact us at the email below.",
-
     "SECURITY": "Data Security",
     "SECURITY_TEXT": "We implement industry-standard security measures, including encryption and restricted access, to protect your information against unauthorized access, alteration, or disclosure.",
-
     "CHILDREN": "Children's Privacy",
     "CHILDREN_TEXT": "Our application is not intended for children under 13 years of age. We do not knowingly collect personal data from children. If we become aware of such data, it will be deleted immediately.",
-
     "CHANGES": "Changes to this Policy",
     "CHANGES_TEXT": "We may update this Privacy Policy from time to time. Changes will be posted on this page, and significant changes will be communicated where appropriate.",
-
     "CONTACT": "Contact Us",
     "CONTACT_TEXT": "For questions or concerns about your data, please contact us at kimrenny.tech@gmail.com."
   },
   "TERMS": {
     "TITLE": "Terms of Service",
     "INTRO": "Welcome to GMHelper. By using this application, you agree to the following Terms. If you do not agree with them, please stop using the application.",
-
     "GENERAL": "General Provisions",
     "GENERAL_TEXT": "GMHelper is intended to help users with various tasks related to its functionality. The application may only be used in accordance with these Terms and applicable law.",
-
     "AGE": "Age Restrictions",
     "AGE_TEXT": "The application may be used by individuals over the age of 13. If you are between 13 and 18 years old, usage is allowed only with the consent of a parent or legal guardian. Users under the age of 13 are not allowed to use the application.",
-
     "ACCOUNTS": "Accounts",
     "ACCOUNTS_TEXT": "No more than 2 accounts may be registered on a single device. It is prohibited to use someone else's account or attempt to gain access to it. Users are responsible for keeping their account credentials safe. GMHelper reserves the right to suspend or permanently delete accounts that violate these rules.",
-
     "CONTENT": "User Content",
     "CONTENT_TEXT": "Users are responsible for the content they upload (e.g., profile images). Any illegal, offensive, or harmful content is strictly prohibited and may result in account termination without refund.",
-
     "SUBSCRIPTIONS": "Subscriptions and Payments",
     "SUBSCRIPTIONS_TEXT": "GMHelper is provided free of charge, but may offer optional paid features or subscriptions. All paid features are optional and not required to use the application. Refunds are only possible in cases provided by applicable law. Accounts terminated due to serious violations are not eligible for refunds.",
-
     "PROHIBITED": "Prohibited Actions",
     "PROHIBITED_TEXT": "You are prohibited from engaging in illegal activities while using the application, attempting to bypass security systems, using the application for purposes that violate the laws of your country of residence, or distributing malicious software through the application.",
-
     "LIABILITY": "Liability",
     "LIABILITY_TEXT": "Users are responsible for all actions performed through their accounts. GMHelper is not liable for failures caused by third-party services, technical issues beyond our control, or actions of other users.",
-
     "JURISDICTION": "Governing Law and Jurisdiction",
     "JURISDICTION_TEXT": "These Terms are governed by applicable international standards and, where necessary, the laws of the country of the application's owner. Any disputes shall be resolved under the jurisdiction chosen by the owner of GMHelper.",
-
     "CHANGES": "Changes to the Terms",
     "CHANGES_TEXT": "GMHelper reserves the right to modify these Terms at any time. Users will be notified of changes through the application or by other available means.",
-
     "CONTACT": "Contact Us",
     "CONTACT_TEXT": "For any questions, please contact GMHelper support at kimrenny.tech@gmail.com."
   },

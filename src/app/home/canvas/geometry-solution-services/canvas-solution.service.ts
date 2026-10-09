@@ -37,6 +37,7 @@ import { environment } from 'src/environments/environment';
 import { TokenService } from 'src/app/services/token.service';
 import { GivenSolutionService } from './given-solution.service';
 import { Pencil } from '../drawing-tools/pencil.tool';
+import { ConditionsService } from '../services/geometry-canvas/conditions.service';
 import * as AuthSelectors from '../../../store/auth/auth.selectors';
 
 @Injectable({
@@ -58,7 +59,8 @@ export class GeoCanvasSolutionService implements CanvasServiceInterface {
     private figuresService: FiguresService,
     private linesService: LinesSolutionService,
     private counterService: CounterSolutionService,
-    private givenService: GivenSolutionService
+    private givenService: GivenSolutionService,
+    private conditionsService: ConditionsService
   ) {}
 
   public getTaskFromApi(id: string): Observable<boolean> {
@@ -80,34 +82,63 @@ export class GeoCanvasSolutionService implements CanvasServiceInterface {
   }
 
   deserializeTaskJson(data: any) {
+    if (!data) return;
     this.pointsService.resetPoints();
     this.stackService.clear();
     this.linesService.clearAllLines();
     this.anglesService.clearAllAngles();
     this.figureElementsService.clearAllFigureElements();
+    this.conditionsService.resetAll();
 
     for (const [figureName, figureData] of Object.entries<any>(data)) {
+      if (figureName === 'additionalConditions' || figureName === 'conditions') {
+        if (Array.isArray(figureData)) {
+          this.conditionsService.setConditions(figureData);
+        }
+        continue;
+      }
+
+      if (figureName === 'target' || figureName === 'find') {
+        if (typeof figureData === 'string') {
+          this.conditionsService.setTarget(figureData);
+        }
+        continue;
+      }
+
+      if (figureName === 'language' || figureName === 'lang' || figureName === 'locale') {
+        continue;
+      }
+
+      const tool = this.getToolByFigureName(figureName, figureData);
+      if (!tool) {
+        continue;
+      }
+
       this.stackService.pushStack(
         {
           figureName: figureName,
           path: figureData.path,
-          tool: this.getToolByFigureName(figureName, figureData),
+          tool: tool,
         },
         'paths'
       );
 
-      const restoredPoints = figureData.points.map((p: any) => ({
+      const restoredPoints = (figureData.points || []).map((p: any) => ({
         ...p,
         attachedToFigure: figureName,
       }));
       this.pointsService.addPoints(restoredPoints);
 
-      for (const [key, value] of Object.entries(figureData.lines)) {
-        this.linesService.setLine(key, value as LineLength);
+      if (figureData.lines) {
+        for (const [key, value] of Object.entries(figureData.lines)) {
+          this.linesService.setLine(key, value as LineLength);
+        }
       }
 
-      for (const [key, value] of Object.entries(figureData.angles)) {
-        this.anglesService.setAngleValue(key, value as LineLength);
+      if (figureData.angles) {
+        for (const [key, value] of Object.entries(figureData.angles)) {
+          this.anglesService.setAngleValue(key, value as LineLength);
+        }
       }
 
       if (figureData.elements && Array.isArray(figureData.elements)) {

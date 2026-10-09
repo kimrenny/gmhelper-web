@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { LineLength } from '../types/line-length.type';
 
 @Component({
   selector: 'line-length-input',
   standalone: true,
+  imports: [TranslateModule],
   templateUrl: './line-length-input.component.html',
   styleUrls: ['./line-length-input.component.scss'],
 })
@@ -24,26 +26,32 @@ export class LineLengthInputComponent {
   decrease() {
     if (
       !this.value ||
-      this.value == 'x' ||
-      this.value == 'y' ||
-      this.value == '?'
+      this.value === 'x' ||
+      this.value === 'y' ||
+      this.value === '?'
     ) {
       this.value = 1;
     } else {
-      if (this.value > 2) this.value--;
+      const num = Number(this.value);
+      if (!isNaN(num) && num > 1) {
+        this.value = num - 1;
+      }
     }
   }
 
   increase() {
     if (
       !this.value ||
-      this.value == 'x' ||
-      this.value == 'y' ||
-      this.value == '?'
+      this.value === 'x' ||
+      this.value === 'y' ||
+      this.value === '?'
     ) {
       this.value = 1;
     } else {
-      this.value++;
+      const num = Number(this.value);
+      if (!isNaN(num)) {
+        this.value = num + 1;
+      }
     }
   }
 
@@ -51,17 +59,26 @@ export class LineLengthInputComponent {
     const input = event.target as HTMLInputElement;
     const val = input.value.trim();
 
+    if (!val) {
+      this.value = null;
+      return;
+    }
+
     if (val === 'x' || val === 'y' || val === '?') {
       this.value = val;
       return;
     }
 
-    const num = parseInt(val, 10);
-    if (!isNaN(num)) {
-      this.value = Math.min(180, Math.max(1, num));
+    const num = parseFloat(val);
+    if (!isNaN(num) && num > 0) {
+      this.value = num;
     } else {
-      this.value = '?';
+      this.value = null;
     }
+  }
+
+  clear() {
+    this.confirm.emit(null);
   }
 
   save() {

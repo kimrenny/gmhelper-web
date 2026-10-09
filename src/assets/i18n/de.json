@@ -169,7 +169,9 @@
       },
       "ANGLE": {
         "CHANGEMEASUREMENT": "Winkelmessung ändern"
-      }
+      },
+      "UNDO": "Letzte Aktion rückgängig machen",
+      "REDO": "Letzte Aktion wiederholen"
     },
     "SETTINGS": {
       "SELECT": {
@@ -181,7 +183,7 @@
     "ERRORS": {
       "INVALID_SIDES_NUMBER": "Ungültige Anzahl der Seiten. Der Wert muss eine ganze Zahl größer oder gleich 3 sein.",
       "LENGTH": {
-        "INCORRECT": "Ungültige Linienlänge. Nur Zahlen, 'x', 'y' oder '?' sind erlaubt."
+        "INCORRECT": "Ungültige Linienlänge. Nur positive Zahlen, 'x', 'y' oder '?' sind erlaubt."
       },
       "ERROR": {
         "TITLE": "Fehler",
@@ -196,7 +198,8 @@
         "PLACEHOLDER": {
           "EDIT_DISABLED": "Die Bearbeitung des LaTeX-Codes ist deaktiviert, bis alle leeren Felder ausgefüllt sind"
         }
-      }
+      },
+      "INVALID_ANGLE_VALUE": "Das Winkelmaß muss zwischen 0° und 180° liegen."
     },
     "EDIT_MODE": {
       "ALERT": "Der Platzhalter-Bearbeitungsmodus ist für das ausgewählte Element aktiviert.<br>Bitte geben Sie ein Zeichen ein. Wenn Sie mehr als ein Zeichen eingeben möchten, verwenden Sie bitte den LaTeX-Code-Editor.<br>Um den Bearbeitungsmodus zu verlassen, klicken Sie unten auf die Schaltfläche oder drücken Sie ESC/Eingabetaste.",
@@ -218,7 +221,10 @@
       "CANCEL": "Abbrechen"
     },
     "SOLUTION": {
-      "RATE": "Lösung bewerten"
+      "RATE": "Lösung bewerten",
+      "STEP": "Schritt",
+      "PROBLEM": "Aufgabe",
+      "FINAL_ANSWER": "Endergebnis"
     },
     "PROCESSING": {
       "MESSAGE_1": "Ihre Aufgabe wird bearbeitet, bitte warten Sie…",
@@ -241,6 +247,51 @@
       "MESSAGE_18": "Fast geschafft! Das System finalisiert Ihre Antwort.",
       "MESSAGE_19": "Verarbeitung läuft… Ihre Aufgabe erscheint in Kürze.",
       "MESSAGE_20": "Bitte warten Sie, die Lösung wird gerade erstellt."
+    },
+    "LENGTH": {
+      "TITLE": "Linienlänge festlegen",
+      "NUM": "ZAHL",
+      "OK": "OK",
+      "DEL": "LÖSCHEN"
+    },
+    "ANGLE": {
+      "TITLE": "Winkelmaß festlegen",
+      "OK": "OK",
+      "DEL": "LÖSCHEN"
+    },
+    "CONDITIONS": {
+      "TITLE": "Bedingungen & Ziel",
+      "PROBLEM_SECTION": "Aufgabenstellung",
+      "PROBLEM_HINT": "Geben Sie die geometrische Aufgabe direkt als Text ein (Zeichnung ist optional)",
+      "PROBLEM_PLACEHOLDER": "z. B. Im Dreieck ABC ist AB = 5, BC = 5, AC = 6. Der Winkel ABC beträgt 60 Grad. Bestimme die Höhe BH auf AC.",
+      "SAVE_PROBLEM": "Aufgabe speichern",
+      "CLEAR_PROBLEM": "Löschen",
+      "CURRENT_PROBLEM": "Aktuelle Aufgabenstellung",
+      "PROBLEM_SAVED": "Aufgabenstellung erfolgreich gespeichert",
+      "TARGET_SECTION": "Ziel (Was zu finden ist)",
+      "TARGET_HINT": "Geben Sie an, was berechnet oder bewiesen werden soll",
+      "TARGET_PLACEHOLDER": "z. B. Finde AB, Finde ∠ABC, Finde Fläche des Dreiecks ABC",
+      "SAVE_TARGET": "Ziel speichern",
+      "CLEAR_TARGET": "Löschen",
+      "CURRENT_TARGET": "Aktuelles Ziel",
+      "TARGET_SAVED": "Ziel erfolgreich gespeichert",
+      "ADDITIONAL_SECTION": "Zusätzliche Bedingungen",
+      "ADDITIONAL_HINT": "Geben Sie beliebige geometrische Bedingungen als Freitext ein",
+      "ADDITIONAL_PLACEHOLDER": "z. B. AB ist parallel zu CD, AB = BC, O ist Mittelpunkt von AC",
+      "ADD_BUTTON": "Hinzufügen",
+      "EDIT_BUTTON": "Bedingung bearbeiten",
+      "DELETE_BUTTON": "Bedingung löschen",
+      "SAVE_EDIT": "Speichern",
+      "CANCEL_EDIT": "Abbrechen",
+      "NO_CONDITIONS": "Noch keine zusätzlichen Bedingungen hinzugefügt",
+      "FIGURE_CONSTRAINTS": "Figureneinschränkungen",
+      "FIGURE_CONSTRAINTS_HINT": "Klicken Sie direkt auf Strecken oder Winkel auf der Leinwand, um Einschränkungen festzulegen",
+      "LINES_SUMMARY": "Linienlängen",
+      "ANGLES_SUMMARY": "Winkelmaße",
+      "NO_LINE_CONSTRAINTS": "Keine Linienlängen-Einschränkungen festgelegt",
+      "NO_ANGLE_CONSTRAINTS": "Keine Winkel-Einschränkungen festgelegt",
+      "DONE": "Fertig",
+      "CLOSE": "Schließen"
     }
   },
   "REGISTER": {
@@ -782,71 +833,50 @@
   "PRIVACY": {
     "TITLE": "Datenschutzbestimmungen",
     "INTRO": "Diese Datenschutzbestimmungen erklären, wie wir Ihre persönlichen Daten erfassen, verwenden und schützen, wenn Sie unsere Anwendung nutzen.",
-
     "COLLECTED_DATA": "Erfasste Daten",
     "COLLECTED_DATA_TEXT": "Wir erfassen verschiedene Arten von Informationen von Ihnen, einschließlich Ihrer E-Mail-Adresse, Anmeldeinformationen, Geolokalisierungsdaten und von Ihnen bereitgestellter Bilder (Avatare). Dies hilft uns, Ihre Erfahrung zu personalisieren und unsere Dienste effektiv bereitzustellen.",
-
     "USE_OF_DATA": "Verwendung der Daten",
     "USE_OF_DATA_TEXT": "Ihre Daten werden verwendet, um die Anwendung zu betreiben und zu verbessern, einschließlich der Verwaltung von Konten, der Anpassung von Inhalten, der Bereitstellung von Kundensupport, der Analyse von Nutzungstrends und der Einhaltung geltender Gesetze.",
-
     "DATA_SHARING": "Datenweitergabe",
     "DATA_SHARING_TEXT": "Wir verkaufen Ihre persönlichen Daten nicht. Wir teilen sie nur mit Dritten, wenn dies für technische Zwecke unbedingt erforderlich ist (z. B. zur Bestimmung des Standorts anhand der IP für Lokalisierung, Hosting, Analysen).",
-
     "STORAGE_DURATION": "Speicherdauer",
     "STORAGE_DURATION_TEXT": "Wir speichern Ihre Daten nur so lange, wie es zur Bereitstellung unserer Dienste erforderlich ist oder gesetzlich vorgeschrieben ist. Sie können jederzeit die Löschung Ihrer Daten beantragen.",
-
     "INTERNATIONAL": "Internationale Datenübertragungen",
     "INTERNATIONAL_TEXT": "Ihre Informationen können auf Servern außerhalb Ihres Wohnsitzlandes gespeichert und verarbeitet werden. Durch die Nutzung der Anwendung stimmen Sie solchen Übertragungen zu, die möglicherweise unterschiedlichen Datenschutzgesetzen unterliegen.",
-
     "COOKIES": "Cookies und Authentifizierung",
     "COOKIES_TEXT": "GMHelper verwendet Cookies, um Benutzersitzungen aufrechtzuerhalten und eine sichere Authentifizierung zu ermöglichen. Diese Cookies speichern Informationen wie Refresh-Tokens, die für die Anmeldung und die Aufrechterhaltung Ihrer Sitzung erforderlich sind. Sie können Cookies in Ihren Browsereinstellungen verwalten, aber das Deaktivieren kann die Nutzung bestimmter Funktionen verhindern.",
-
     "USER_RIGHTS": "Ihre Rechte",
     "USER_RIGHTS_TEXT": "Sie haben das Recht, auf Ihre persönlichen Daten zuzugreifen, diese zu korrigieren oder zu löschen. Sie können auch Ihre Einwilligung zur Verarbeitung jederzeit widerrufen. Um diese Rechte auszuüben, kontaktieren Sie uns bitte unter der unten angegebenen E-Mail-Adresse.",
-
     "SECURITY": "Datensicherheit",
     "SECURITY_TEXT": "Wir implementieren branchenübliche Sicherheitsmaßnahmen, einschließlich Verschlüsselung und eingeschränktem Zugriff, um Ihre Informationen vor unbefugtem Zugriff, Änderung oder Offenlegung zu schützen.",
-
     "CHILDREN": "Datenschutz für Kinder",
     "CHILDREN_TEXT": "Unsere Anwendung richtet sich nicht an Kinder unter 13 Jahren. Wir erfassen wissentlich keine persönlichen Daten von Kindern. Wenn wir solche Daten feststellen, werden sie sofort gelöscht.",
-
     "CHANGES": "Änderungen dieser Richtlinie",
     "CHANGES_TEXT": "Wir können diese Datenschutzbestimmungen von Zeit zu Zeit aktualisieren. Änderungen werden auf dieser Seite veröffentlicht, und wesentliche Änderungen werden, wenn angebracht, kommuniziert.",
-
     "CONTACT": "Kontakt",
     "CONTACT_TEXT": "Bei Fragen oder Bedenken zu Ihren Daten kontaktieren Sie uns bitte unter kimrenny.tech@gmail.com."
   },
   "TERMS": {
     "TITLE": "Nutzungsbedingungen",
     "INTRO": "Willkommen bei GMHelper. Durch die Nutzung dieser Anwendung stimmen Sie den folgenden Bedingungen zu. Wenn Sie nicht zustimmen, verwenden Sie die Anwendung bitte nicht.",
-
     "GENERAL": "Allgemeine Bestimmungen",
     "GENERAL_TEXT": "GMHelper soll Benutzern bei verschiedenen Aufgaben im Zusammenhang mit seiner Funktionalität helfen. Die Anwendung darf nur in Übereinstimmung mit diesen Bedingungen und den geltenden Gesetzen verwendet werden.",
-
     "AGE": "Altersbeschränkungen",
     "AGE_TEXT": "Die Anwendung darf von Personen über 13 Jahren genutzt werden. Wenn Sie zwischen 13 und 18 Jahre alt sind, ist die Nutzung nur mit Zustimmung eines Elternteils oder gesetzlichen Vormunds erlaubt. Benutzer unter 13 Jahren dürfen die Anwendung nicht nutzen.",
-
     "ACCOUNTS": "Konten",
     "ACCOUNTS_TEXT": "Auf einem Gerät dürfen nicht mehr als 2 Konten registriert werden. Es ist untersagt, das Konto eines anderen zu verwenden oder darauf zuzugreifen. Benutzer sind dafür verantwortlich, ihre Kontodaten sicher aufzubewahren. GMHelper behält sich das Recht vor, Konten, die gegen diese Regeln verstoßen, zu sperren oder dauerhaft zu löschen.",
-
     "CONTENT": "Benutzerinhalte",
     "CONTENT_TEXT": "Benutzer sind für die von ihnen hochgeladenen Inhalte verantwortlich (z. B. Profilbilder). Jegliche illegalen, anstößigen oder schädlichen Inhalte sind streng verboten und können zur Kontosperrung ohne Rückerstattung führen.",
-
     "SUBSCRIPTIONS": "Abonnements und Zahlungen",
     "SUBSCRIPTIONS_TEXT": "GMHelper wird kostenlos bereitgestellt, kann jedoch optionale kostenpflichtige Funktionen oder Abonnements anbieten. Alle kostenpflichtigen Funktionen sind optional und nicht erforderlich, um die Anwendung zu nutzen. Rückerstattungen sind nur in den gesetzlich vorgesehenen Fällen möglich. Konten, die aufgrund schwerwiegender Verstöße beendet wurden, haben keinen Anspruch auf Rückerstattung.",
-
     "PROHIBITED": "Verbotene Handlungen",
     "PROHIBITED_TEXT": "Es ist verboten, während der Nutzung der Anwendung illegale Aktivitäten auszuführen, Sicherheitsmechanismen zu umgehen, die Anwendung für Zwecke zu nutzen, die gegen die Gesetze Ihres Wohnsitzlandes verstoßen, oder bösartige Software über die Anwendung zu verbreiten.",
-
     "LIABILITY": "Haftung",
     "LIABILITY_TEXT": "Benutzer sind für alle Aktionen verantwortlich, die über ihre Konten ausgeführt werden. GMHelper haftet nicht für Ausfälle, die durch Dienste Dritter, technische Probleme außerhalb unserer Kontrolle oder Handlungen anderer Benutzer verursacht werden.",
-
     "JURISDICTION": "Anwendbares Recht und Gerichtsstand",
     "JURISDICTION_TEXT": "Diese Bedingungen unterliegen den geltenden internationalen Standards und, falls erforderlich, den Gesetzen des Landes, in dem sich der Eigentümer der Anwendung befindet. Alle Streitigkeiten werden unter der vom Eigentümer von GMHelper gewählten Gerichtsbarkeit beigelegt.",
-
     "CHANGES": "Änderungen der Bedingungen",
     "CHANGES_TEXT": "GMHelper behält sich das Recht vor, diese Bedingungen jederzeit zu ändern. Benutzer werden über Änderungen durch die Anwendung oder auf anderem verfügbaren Wege informiert.",
-
     "CONTACT": "Kontakt",
     "CONTACT_TEXT": "Bei Fragen wenden Sie sich bitte an den GMHelper-Support unter kimrenny.tech@gmail.com."
   },

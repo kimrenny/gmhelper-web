@@ -1,6 +1,25 @@
 <div class="angle-input-window">
-  <button (click)="decrease()">-</button>
-  <input type="number" [value]="value" (input)="onInput($event)" />
-  <button (click)="increase()">+</button>
-  <button (click)="save()">OK</button>
+  <button (click)="decrease()" aria-label="-">-</button>
+  <input
+    type="text"
+    [value]="value"
+    (input)="onInput($event)"
+    [attr.aria-label]="'CANVAS.ANGLE.TITLE' | translate"
+  />
+  <span class="degree-symbol">°</span>
+  <button (click)="increase()" aria-label="+">+</button>
+  <button
+    (click)="save()"
+    class="save-btn"
+    [attr.aria-label]="'CANVAS.ANGLE.OK' | translate"
+  >
+    {{ "CANVAS.ANGLE.OK" | translate }}
+  </button>
+  <button
+    (click)="clear()"
+    class="clear-btn"
+    [attr.aria-label]="'CANVAS.ANGLE.DEL' | translate"
+  >
+    {{ "CANVAS.ANGLE.DEL" | translate }}
+  </button>
 </div>

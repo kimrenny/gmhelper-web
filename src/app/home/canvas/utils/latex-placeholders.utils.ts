@@ -6,7 +6,12 @@ export function addPlaceholderAttributes(
   latexTree: LatexNode[],
   selectedId: string | null
 ) {
-  const elements = Array.from(container.querySelectorAll('mo'));
+  let elements = Array.from(container.querySelectorAll('.placeholder')) as HTMLElement[];
+  if (elements.length === 0) {
+    elements = (Array.from(container.querySelectorAll('mo, mi, mtext, span')) as HTMLElement[]).filter(
+      (el) => el.textContent?.trim() === '?'
+    );
+  }
 
   let placeholderIndex = 0;
 
@@ -49,12 +54,14 @@ export function addPlaceholderAttributes(
             if (node.integrand) markPlaceholders(node.integrand);
             break;
           case 'lim':
+            if (node.variable) markPlaceholders(node.variable);
+            if (node.approach) markPlaceholders(node.approach);
             if (node.expr) markPlaceholders(node.expr);
             break;
           case 'matrix':
+          case 'system':
             if (node.rows) {
               for (const row of node.rows) {
-                if (placeholderIndex === 0) placeholderIndex++;
                 markPlaceholders(row);
               }
             }
@@ -98,9 +105,12 @@ export function assignNewPlaceholderIds(
             assignNewPlaceholderIds(node.integrand, idService);
           break;
         case 'lim':
+          if (node.variable) assignNewPlaceholderIds(node.variable, idService);
+          if (node.approach) assignNewPlaceholderIds(node.approach, idService);
           if (node.expr) assignNewPlaceholderIds(node.expr, idService);
           break;
         case 'matrix':
+        case 'system':
           if (node.rows) {
             for (const row of node.rows) {
               assignNewPlaceholderIds(row, idService);
@@ -137,9 +147,12 @@ export function hasPlaceholders(nodes: LatexNode[]): boolean {
       case 'integral':
         return hasPlaceholders(node.integrand ?? []);
       case 'lim':
-        return hasPlaceholders(node.expr ?? []);
-      /* disabled */
-      //case 'system':
+        return (
+          hasPlaceholders(node.variable ?? []) ||
+          hasPlaceholders(node.approach ?? []) ||
+          hasPlaceholders(node.expr ?? [])
+        );
+      case 'system':
       case 'matrix':
         return node.rows.some((row) => hasPlaceholders(row));
       default:

@@ -16,6 +16,10 @@ export function isLatexValidWithoutPlaceholders(
   latexTree: LatexNode[],
   latex: string
 ): boolean {
+  if (!latex || !latex.trim()) {
+    return false;
+  }
+
   if (hasPlaceholders(latexTree)) {
     return false;
   }
@@ -128,15 +132,23 @@ export function isLatexStructurallyValid(latex: string): boolean {
       continue;
     }
 
-    // if (s.startsWith('\\left\\{\\begin{array}', i)) {
-    //   const endSig = '\\end{array}\\right.';
-    //   const endIdx = s.indexOf(endSig, i);
-    //   if (endIdx === -1) return false;
-    //   i = endIdx + endSig.length;
-    //   continue;
-    // }
+    if (s.startsWith('\\begin{cases}', i)) {
+      const start = i + '\\begin{cases}'.length;
+      const endIdx = s.indexOf('\\end{cases}', start);
+      if (endIdx === -1) return false;
+      i = endIdx + '\\end{cases}'.length;
+      continue;
+    }
 
-    if (s[i] === '^') {
+    if (s.startsWith('\\left\\{\\begin{array}', i)) {
+      const endSig = '\\end{array}\\right.';
+      const endIdx = s.indexOf(endSig, i);
+      if (endIdx === -1) return false;
+      i = endIdx + endSig.length;
+      continue;
+    }
+
+    if (s[i] === '^' || s[i] === '_') {
       i++;
       while (i < s.length && /\s/.test(s[i])) i++;
       if (s[i] === '{') {

@@ -1,36 +1,92 @@
 .length-input-container {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
   border-radius: 8px;
-  padding: 12px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: max-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .length-input-window {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 
   input {
-    width: 60px;
+    width: 54px;
+    height: 32px;
     text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #2196f3;
+    }
   }
 
   button {
-    padding: 6px 10px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+
+    &.save-btn {
+      background: #2196f3;
+      color: white;
+      border-color: #2196f3;
+
+      &:hover {
+        background: #1976d2;
+      }
+    }
   }
 }
 
 .preset-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 
   button {
     flex: 1;
-    padding: 6px 5px;
-    margin: 0 4px;
-    max-width: 100px;
+    height: 28px;
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+
+    &.clear-btn {
+      background: #f44336;
+      color: white;
+      border-color: #f44336;
+
+      &:hover {
+        background: #d32f2f;
+      }
+    }
   }
 }

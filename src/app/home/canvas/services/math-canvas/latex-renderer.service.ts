@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlaceholderIdService } from './placeholderId.service';
 import { LatexNode } from '../../tools/math-expression.model';
-import {
-  fixNestedPowers,
-  latexNodesToLatex,
-} from '../../utils/latex-parser.utils';
+import { latexNodesToLatex } from '../../utils/latex-parser.utils';
 import {
   isLatexValid,
   unwrapAligned,
@@ -36,12 +33,11 @@ export class LatexRendererService {
 
     const rawLatex = latexNodesToLatex(tree, selectedPlaceholderId);
     const wrapped = wrapAligned(rawLatex);
-    const fixedLatex = fixNestedPowers(wrapped);
 
-    if (!isLatexValid(fixedLatex)) return { latex: '', success: false };
+    if (!isLatexValid(wrapped)) return { latex: '', success: false };
 
     try {
-      katex.render(fixedLatex, element, {
+      katex.render(wrapped, element, {
         throwOnError: throwError,
         displayMode: true,
         output: 'mathml',
@@ -52,7 +48,7 @@ export class LatexRendererService {
       return { latex: '', success: false };
     }
 
-    const unwrapped = unwrapAligned(fixedLatex);
+    const unwrapped = unwrapAligned(wrapped);
 
     this.placeholderIdService.reset();
     assignNewPlaceholderIds(tree, this.placeholderIdService);
@@ -73,12 +69,11 @@ export class LatexRendererService {
     element.innerHTML = '';
 
     const wrapped = wrapAligned(latex);
-    const fixedLatex = fixNestedPowers(wrapped);
 
-    if (!isLatexValid(fixedLatex)) return { success: false };
+    if (!isLatexValid(wrapped)) return { success: false };
 
     try {
-      katex.render(fixedLatex, element, {
+      katex.render(wrapped, element, {
         throwOnError: throwError,
         displayMode: true,
         output: 'mathml',

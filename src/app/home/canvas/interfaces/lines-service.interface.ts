@@ -6,6 +6,8 @@ export interface LinesServiceInterface {
 
   setLineLength(point1: string, point2: string, length: LineLength): void;
 
+  deleteLineLength(point1: string, point2: string): void;
+
   setPolygonLinesLength(point: any, length: LineLength): void;
 
   getAllLines(): Record<string, LineLength>;

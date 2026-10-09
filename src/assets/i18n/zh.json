@@ -169,7 +169,9 @@
       },
       "ANGLE": {
         "CHANGEMEASUREMENT": "更改角度测量"
-      }
+      },
+      "UNDO": "撤销上一步操作",
+      "REDO": "重做上一步操作"
     },
     "SETTINGS": {
       "SELECT": {
@@ -181,7 +183,7 @@
     "ERRORS": {
       "INVALID_SIDES_NUMBER": "边数无效。该值必须是大于或等于 3 的整数。",
       "LENGTH": {
-        "INCORRECT": "无效的线段长度。只允许数字、'x'、'y' 或 '?'."
+        "INCORRECT": "无效的线段长度。只允许正数、'x'、'y' 或 '?'。"
       },
       "ERROR": {
         "TITLE": "错误",
@@ -196,7 +198,8 @@
         "PLACEHOLDER": {
           "EDIT_DISABLED": "在填写所有空字段之前，LaTeX 代码的编辑功能已被禁用"
         }
-      }
+      },
+      "INVALID_ANGLE_VALUE": "角度值必须在 0° 到 180° 之间。"
     },
     "EDIT_MODE": {
       "ALERT": "所选元素已启用占位符编辑模式。<br>请输入一个字符。若需输入多个字符，请使用 LaTeX 编辑器。<br>要退出编辑模式，请点击下方按钮或按 ESC/Enter 键。",
@@ -218,7 +221,10 @@
       "CANCEL": "取消"
     },
     "SOLUTION": {
-      "RATE": "评价答案"
+      "RATE": "评价答案",
+      "STEP": "步骤",
+      "PROBLEM": "题目",
+      "FINAL_ANSWER": "最终答案"
     },
     "PROCESSING": {
       "MESSAGE_1": "您的任务正在处理中，请稍候…",
@@ -241,6 +247,51 @@
       "MESSAGE_18": "快完成了！系统正在最终生成您的答案。",
       "MESSAGE_19": "处理中…您的任务即将显示。",
       "MESSAGE_20": "请稍候，解答正在生成中。"
+    },
+    "LENGTH": {
+      "TITLE": "设置线段长度",
+      "NUM": "数字",
+      "OK": "确认",
+      "DEL": "删除"
+    },
+    "ANGLE": {
+      "TITLE": "设置角度大小",
+      "OK": "确认",
+      "DEL": "删除"
+    },
+    "CONDITIONS": {
+      "TITLE": "条件与求解目标",
+      "PROBLEM_SECTION": "题目描述",
+      "PROBLEM_HINT": "直接以纯文本输入几何题目（绘图为可选项）",
+      "PROBLEM_PLACEHOLDER": "例如：在三角形 ABC 中，AB = 5，BC = 5，AC = 6。角 ABC 为 60 度。求边 AC 上的高 BH。",
+      "SAVE_PROBLEM": "保存题目",
+      "CLEAR_PROBLEM": "清除",
+      "CURRENT_PROBLEM": "当前题目描述",
+      "PROBLEM_SAVED": "题目描述保存成功",
+      "TARGET_SECTION": "目标 (要求解的内容)",
+      "TARGET_HINT": "指明需要计算或证明的内容",
+      "TARGET_PLACEHOLDER": "例如：求 AB，求 ∠ABC，求三角形 ABC 的面积",
+      "SAVE_TARGET": "保存目标",
+      "CLEAR_TARGET": "清除",
+      "CURRENT_TARGET": "当前目标",
+      "TARGET_SAVED": "目标保存成功",
+      "ADDITIONAL_SECTION": "附加条件",
+      "ADDITIONAL_HINT": "输入任意文本几何条件",
+      "ADDITIONAL_PLACEHOLDER": "例如：AB 平行于 CD，AB = BC，O 是 AC 的中点",
+      "ADD_BUTTON": "添加",
+      "EDIT_BUTTON": "编辑条件",
+      "DELETE_BUTTON": "删除条件",
+      "SAVE_EDIT": "保存",
+      "CANCEL_EDIT": "取消",
+      "NO_CONDITIONS": "尚未添加附加条件",
+      "FIGURE_CONSTRAINTS": "图形几何约束",
+      "FIGURE_CONSTRAINTS_HINT": "直接在画布上点击线段或角以设置几何约束",
+      "LINES_SUMMARY": "线段长度",
+      "ANGLES_SUMMARY": "角度测量",
+      "NO_LINE_CONSTRAINTS": "未设置线段长度约束",
+      "NO_ANGLE_CONSTRAINTS": "未设置角度约束",
+      "DONE": "完成",
+      "CLOSE": "关闭"
     }
   },
   "REGISTER": {
@@ -782,70 +833,50 @@
   "PRIVACY": {
     "TITLE": "隐私政策",
     "INTRO": "本隐私政策说明了在您使用我们的应用程序时，我们如何收集、使用和保护您的个人信息。",
-
     "COLLECTED_DATA": "收集的数据",
     "COLLECTED_DATA_TEXT": "我们会收集您提供的各种信息，包括电子邮件地址、登录凭证、地理位置信息以及用户上传的图片（头像）。这些信息有助于我们个性化您的体验并有效提供服务。",
-
     "USE_OF_DATA": "数据使用",
     "USE_OF_DATA_TEXT": "您的数据用于操作和改进应用程序，包括账户管理、内容定制、提供客户支持、分析使用趋势以及确保遵守适用法律。",
-
     "DATA_SHARING": "数据共享",
     "DATA_SHARING_TEXT": "我们不会出售您的个人数据。我们仅在严格必要的技术目的下与第三方共享（例如，通过 IP 确定位置以进行本地化、托管、分析）。",
-
     "STORAGE_DURATION": "存储期限",
     "STORAGE_DURATION_TEXT": "我们仅在提供服务所必需的时间内或法律要求的情况下存储您的数据。您可以随时请求删除您的数据。",
-
     "INTERNATIONAL": "国际数据传输",
     "INTERNATIONAL_TEXT": "您的信息可能存储和处理于您居住国以外的服务器上。使用本应用程序即表示您同意此类传输，这些传输可能适用不同的数据保护法律。",
-
     "COOKIES": "Cookies 与身份验证",
     "COOKIES_TEXT": "GMHelper 使用 Cookies 来维护用户会话并实现安全身份验证。这些 Cookies 会存储诸如刷新令牌（refresh token）之类的信息，这些信息对于登录和保持会话活跃是必要的。您可以在浏览器设置中管理 Cookies，但禁用它们可能会导致某些功能无法使用。",
     "USER_RIGHTS": "您的权利",
     "USER_RIGHTS_TEXT": "您有权访问、更正或删除您的个人数据。您也可以随时撤回处理同意。要行使这些权利，请通过以下电子邮件与我们联系。",
-
     "SECURITY": "数据安全",
     "SECURITY_TEXT": "我们实施行业标准的安全措施，包括加密和访问限制，以保护您的信息免受未经授权的访问、修改或披露。",
-
     "CHILDREN": "儿童隐私",
     "CHILDREN_TEXT": "我们的应用程序不适用于 13 岁以下儿童。我们不会故意收集儿童的个人数据。如果发现此类数据，将立即删除。",
-
     "CHANGES": "政策变更",
     "CHANGES_TEXT": "我们可能会不时更新本隐私政策。更改将发布在本页面上，重要更改将在适当情况下通知用户。",
-
     "CONTACT": "联系我们",
     "CONTACT_TEXT": "如对您的数据有任何疑问，请通过 kimrenny.tech@gmail.com 与我们联系。"
   },
   "TERMS": {
     "TITLE": "服务条款",
     "INTRO": "欢迎使用 GMHelper。使用本应用程序即表示您同意以下条款。如不同意，请停止使用本应用程序。",
-
     "GENERAL": "一般条款",
     "GENERAL_TEXT": "GMHelper 旨在帮助用户完成与其功能相关的各种任务。应用程序仅可根据这些条款及适用法律使用。",
-
     "AGE": "年龄限制",
     "AGE_TEXT": "应用程序可供 13 岁以上个人使用。若您年龄在 13 至 18 岁之间，使用须经父母或法定监护人同意。13 岁以下用户禁止使用本应用程序。",
-
     "ACCOUNTS": "账户",
     "ACCOUNTS_TEXT": "单个设备上最多可注册 2 个账户。禁止使用他人账户或尝试获取他人账户访问权限。用户需妥善保管账户凭证。GMHelper 保留暂停或永久删除违规账户的权利。",
-
     "CONTENT": "用户内容",
     "CONTENT_TEXT": "用户对其上传的内容（如头像）负责。任何非法、冒犯或有害内容均严格禁止，可能导致账户被终止且不退款。",
-
     "SUBSCRIPTIONS": "订阅与付款",
     "SUBSCRIPTIONS_TEXT": "GMHelper 免费提供，但可能提供可选付费功能或订阅。所有付费功能为可选，使用应用程序无需付费。仅在适用法律规定的情况下可退款。因严重违规而终止的账户不享受退款。",
-
     "PROHIBITED": "禁止行为",
     "PROHIBITED_TEXT": "禁止在使用应用程序时从事非法活动、尝试绕过安全系统、为违反居住国法律的目的使用应用程序或通过应用程序分发恶意软件。",
-
     "LIABILITY": "责任",
     "LIABILITY_TEXT": "用户需对其账户执行的所有操作负责。GMHelper 对第三方服务导致的故障、超出控制范围的技术问题或其他用户行为不承担责任。",
-
     "JURISDICTION": "适用法律与管辖权",
     "JURISDICTION_TEXT": "这些条款受适用的国际标准以及在必要时应用程序所有者所在国法律管辖。任何争议应由 GMHelper 所有者选择的管辖权解决。",
-
     "CHANGES": "条款变更",
     "CHANGES_TEXT": "GMHelper 保留随时修改这些条款的权利。用户将通过应用程序或其他可用方式收到变更通知。",
-
     "CONTACT": "联系我们",
     "CONTACT_TEXT": "如有任何问题，请联系 GMHelper 支持：kimrenny.tech@gmail.com。"
   },

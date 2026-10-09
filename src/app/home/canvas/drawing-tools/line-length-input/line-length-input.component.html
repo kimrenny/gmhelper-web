@@ -1,15 +1,38 @@
 <div class="length-input-container">
   <div class="length-input-window">
-    <button (click)="decrease()">-</button>
-    <input type="text" [value]="value" (input)="onInput($event)" />
-    <button (click)="increase()">+</button>
-    <button (click)="save()">OK</button>
+    <button (click)="decrease()" aria-label="-">-</button>
+    <input
+      type="text"
+      [value]="value ?? ''"
+      (input)="onInput($event)"
+      [attr.aria-label]="'CANVAS.LENGTH.TITLE' | translate"
+    />
+    <button (click)="increase()" aria-label="+">+</button>
+    <button
+      (click)="save()"
+      class="save-btn"
+      [attr.aria-label]="'CANVAS.LENGTH.OK' | translate"
+    >
+      {{ "CANVAS.LENGTH.OK" | translate }}
+    </button>
   </div>
 
   <div class="preset-buttons">
-    <button (click)="setValue(1)">NUM</button>
-    <button (click)="setValue('x')">x</button>
-    <button (click)="setValue('y')">y</button>
-    <button (click)="setValue('?')">?</button>
+    <button
+      (click)="setValue(1)"
+      [attr.aria-label]="'CANVAS.LENGTH.NUM' | translate"
+    >
+      {{ "CANVAS.LENGTH.NUM" | translate }}
+    </button>
+    <button (click)="setValue('x')" aria-label="x">x</button>
+    <button (click)="setValue('y')" aria-label="y">y</button>
+    <button (click)="setValue('?')" aria-label="?">?</button>
+    <button
+      (click)="clear()"
+      class="clear-btn"
+      [attr.aria-label]="'CANVAS.LENGTH.DEL' | translate"
+    >
+      {{ "CANVAS.LENGTH.DEL" | translate }}
+    </button>
   </div>
 </div>

@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { ApiResponse } from 'src/app/models/api-response.model';
 import { environment } from 'src/environments/environment';
 import { TokenService } from 'src/app/services/token.service';
+import { LanguageService } from 'src/app/services/language.service';
 import { isLatexValid } from '../../utils/latex-validation.utils';
 
 @Injectable({
@@ -30,7 +31,10 @@ export class CanvasService {
   private api = `${environment.apiUrl}`;
   private http = inject(HttpClient);
 
-  constructor(private tokenService: TokenService) {}
+  constructor(
+    private tokenService: TokenService,
+    private languageService: LanguageService
+  ) {}
 
   setLatex(latex: string) {
     this.latex = latex;
@@ -75,7 +79,11 @@ export class CanvasService {
 
   serializeTaskJson(): any {
     if (isLatexValid(this.latex)) {
-      return { data: this.latex };
+      const language = this.languageService.getCurrentLanguage();
+      return {
+        data: this.latex,
+        language: language,
+      };
     }
 
     return null;

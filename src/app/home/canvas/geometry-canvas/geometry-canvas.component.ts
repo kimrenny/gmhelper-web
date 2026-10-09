@@ -35,6 +35,7 @@ import { Subscription } from 'rxjs';
 import { rawFigureToolMap } from '../tools/figure-tool-map';
 import { LineLengthInputComponent } from '../drawing-tools/line-length-input/line-length-input.component';
 import { HeaderService } from 'src/app/services/header.service';
+import { ConditionsService } from '../services/geometry-canvas/conditions.service';
 
 @Component({
   selector: 'app-geometry-canvas',
@@ -62,9 +63,17 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   currentScaleFactor = 1;
   selectedFigure: string | null = null;
   selectedAngle: string | null = null;
+  selectedAngleValue: number = 60;
   colors = COLORS;
 
   hoveredButton: string | null = null;
+
+  showConditionsModal = false;
+  problemInputText = '';
+  targetInputText = '';
+  newConditionText = '';
+  editingConditionIndex: number | null = null;
+  editingConditionText = '';
 
   private polygonFactory = (sides: number): DrawingTool => {
     return new Polygon(
@@ -122,6 +131,7 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     private figuresService: FiguresService,
     private selectionService: SelectionService,
     private counterService: CounterService,
+    public conditionsService: ConditionsService,
     private headerService: HeaderService,
     private toastr: ToastrService,
     private translate: TranslateService
@@ -426,6 +436,8 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           angleData.attachedToPoint
         );
         this.selectedAngle = angleData.label;
+        const currentAngle = this.anglesService.getAngleValue(angleData.label);
+        this.selectedAngleValue = typeof currentAngle === 'number' ? currentAngle : 60;
       }
     }
   }
@@ -606,9 +618,22 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onAngleConfirm(value: number) {
+  onAngleConfirm(value: number | null) {
     if (!this.selectedAngle) return;
-    this.anglesService.setAngleValue(this.selectedAngle, value);
+    if (value === null) {
+      this.anglesService.deleteAngle(this.selectedAngle);
+    } else {
+      if (typeof value === 'number' && (value <= 0 || value >= 180)) {
+        this.toastr.error(
+          this.translate.instant('CANVAS.ERRORS.INVALID_ANGLE_VALUE') ||
+            'Angle must be between 0° and 180°',
+          this.translate.instant('CANVAS.ERRORS.ERROR.TITLE')
+        );
+        this.isAngleInputVisible = false;
+        return;
+      }
+      this.anglesService.setAngleValue(this.selectedAngle, value);
+    }
     this.redraw();
     this.isAngleInputVisible = false;
   }
@@ -663,32 +688,44 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onLineLengthConfirm(value: LineLength): void {
-    if (value != null) {
-      const val = value.toString().trim();
-
-      const isNumeric = /^-?\d+(\.\d+)?$/.test(val);
-      const allowedKeywords = ['x', 'y', '?'];
-      const isValid = isNumeric || allowedKeywords.includes(val);
-
-      if (!isValid) {
-        this.toastr.error(
-          this.translate.instant('CANVAS.LENGTH.LENGTH.INCORRECT'),
-          this.translate.instant('CANVAS.ERRORS.ERROR.TITLE')
-        );
-        this.isLineLengthChanging = false;
-        this.lineLength = null;
-        return;
-      }
-
+    if (value === null) {
       const selectedLine = this.selectionService.getSelectedLine();
       if (selectedLine) {
         const a = this.pointsService.getPointLabelByCoords(selectedLine.a);
         const b = this.pointsService.getPointLabelByCoords(selectedLine.b);
-        if (!a || !b) return;
-        this.linesService.setLineLength(a, b, value);
-        this.deselectLine();
-        this.redraw();
+        if (a && b) {
+          this.linesService.deleteLineLength(a, b);
+          this.deselectLine();
+          this.redraw();
+        }
       }
+      return;
+    }
+
+    const val = value.toString().trim();
+    const isNumeric = /^-?\d+(\.\d+)?$/.test(val);
+    const allowedKeywords = ['x', 'y', '?'];
+    const isValid = isNumeric || allowedKeywords.includes(val);
+
+    if (!isValid || (isNumeric && parseFloat(val) <= 0)) {
+      this.toastr.error(
+        this.translate.instant('CANVAS.LENGTH.LENGTH.INCORRECT'),
+        this.translate.instant('CANVAS.ERRORS.ERROR.TITLE')
+      );
+      this.isLineLengthChanging = false;
+      this.lineLength = null;
+      return;
+    }
+
+    const selectedLine = this.selectionService.getSelectedLine();
+    if (selectedLine) {
+      const a = this.pointsService.getPointLabelByCoords(selectedLine.a);
+      const b = this.pointsService.getPointLabelByCoords(selectedLine.b);
+      if (!a || !b) return;
+      const numVal: LineLength = isNumeric ? parseFloat(val) : (val as 'x' | 'y' | '?');
+      this.linesService.setLineLength(a, b, numVal);
+      this.deselectLine();
+      this.redraw();
     }
   }
 
@@ -746,6 +783,114 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         break;
       }
     }
+  }
+
+  get conditionsCount(): number {
+    let count = this.conditionsService.getConditions().length;
+    if (this.conditionsService.getProblem().trim()) {
+      count++;
+    }
+    if (this.conditionsService.getTarget().trim()) {
+      count++;
+    }
+    return count;
+  }
+
+  get hasTextProblem(): boolean {
+    return !!(
+      this.conditionsService.getProblem().trim() ||
+      this.conditionsService.getTarget().trim() ||
+      this.conditionsService.getConditions().length > 0
+    );
+  }
+
+  openConditionsModal(): void {
+    this.problemInputText = this.conditionsService.getProblem();
+    this.targetInputText = this.conditionsService.getTarget();
+    this.newConditionText = '';
+    this.editingConditionIndex = null;
+    this.showConditionsModal = true;
+  }
+
+  closeConditionsModal(): void {
+    this.showConditionsModal = false;
+    this.editingConditionIndex = null;
+  }
+
+  saveProblem(): void {
+    this.conditionsService.setProblem(this.problemInputText);
+    this.toastr.success(
+      this.translate.instant('CANVAS.CONDITIONS.PROBLEM_SAVED'),
+      this.translate.instant('CANVAS.CONDITIONS.TITLE')
+    );
+  }
+
+  clearProblem(): void {
+    this.problemInputText = '';
+    this.conditionsService.clearProblem();
+  }
+
+  saveTarget(): void {
+    this.conditionsService.setTarget(this.targetInputText);
+    this.toastr.success(
+      this.translate.instant('CANVAS.CONDITIONS.TARGET_SAVED'),
+      this.translate.instant('CANVAS.CONDITIONS.TITLE')
+    );
+  }
+
+  clearTarget(): void {
+    this.targetInputText = '';
+    this.conditionsService.clearTarget();
+  }
+
+  addAdditionalCondition(): void {
+    const text = this.newConditionText.trim();
+    if (!text) return;
+    this.conditionsService.addCondition(text);
+    this.newConditionText = '';
+  }
+
+  startEditCondition(index: number, text: string): void {
+    this.editingConditionIndex = index;
+    this.editingConditionText = text;
+  }
+
+  saveEditCondition(index: number): void {
+    const text = this.editingConditionText.trim();
+    if (text) {
+      this.conditionsService.updateCondition(index, text);
+    }
+    this.editingConditionIndex = null;
+  }
+
+  cancelEditCondition(): void {
+    this.editingConditionIndex = null;
+  }
+
+  deleteAdditionalCondition(index: number): void {
+    this.conditionsService.deleteCondition(index);
+  }
+
+  getFigureLinesList(): { line: string; length: number | string }[] {
+    const result: { line: string; length: number | string }[] = [];
+    const lines = this.linesService.getAllLines();
+    for (const [lineKey, lineVal] of Object.entries(lines)) {
+      if (lineVal != null) {
+        result.push({ line: lineKey, length: lineVal });
+      }
+    }
+    return result;
+  }
+
+  getFigureAnglesList(): { angle: string; value: number | string }[] {
+    const result: { angle: string; value: number | string }[] = [];
+    const angles = this.anglesService.getAllAngles();
+    for (const [angleKey, angleVal] of Object.entries(angles)) {
+      if (angleVal != null) {
+        result.push({ angle: angleKey, value: angleVal });
+      }
+    }
+    return result;
   }
 
   onSubmitTask(): void {
@@ -810,6 +955,7 @@ export class GeoCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.counterService.resetCounter();
     this.figureElementsService.clearAllFigureElements();
     this.anglesService.clearAllAngles();
+    this.conditionsService.clearAll();
     this.deselectAngle();
     this.deselectFigure();
   }

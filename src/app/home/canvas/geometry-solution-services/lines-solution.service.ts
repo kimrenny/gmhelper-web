@@ -37,8 +37,17 @@ export class LinesSolutionService {
       const lineName = point1 + point2;
       if (lineName in this.lines) {
         this.lines[lineName] = length;
+      } else {
+        this.lines[lineName] = length;
       }
     }
+  }
+
+  deleteLineLength(point1: string, point2: string): void {
+    const lineName1 = point1 + point2;
+    const lineName2 = point2 + point1;
+    delete this.lines[lineName1];
+    delete this.lines[lineName2];
   }
 
   setPolygonLinesLength(point: Point, length: LineLength): void {
@@ -101,7 +110,7 @@ export class LinesSolutionService {
   }
 
   getLineLength(a: string, b: string): LineLength {
-    return this.lines[`${a}${b}`] ?? this.lines[`${b}${a}`];
+    return this.lines[`${a}${b}`] ?? this.lines[`${b}${a}`] ?? null;
   }
 
   findLineByPoint(pos: { x: number; y: number }): {

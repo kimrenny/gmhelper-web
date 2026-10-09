@@ -18,16 +18,45 @@
   </div>
 
   <div class="canvas-controls" [class.disabled]="!selectedSubject">
-    <button
-      class="undo-btn"
-      (click)="undo()"
-      [class.disabled]="!canUndo"
-    ></button>
-    <button
-      class="redo-btn"
-      (click)="redo()"
-      [class.disabled]="!canRedo"
-    ></button>
+    <div class="button-wrapper">
+      <button
+        class="undo-btn"
+        (click)="undo()"
+        [class.disabled]="!canUndo"
+        (mouseenter)="hoveredButton = 'undo'"
+        (mouseleave)="hoveredButton = null"
+      ></button>
+      <div *ngIf="hoveredButton === 'undo'" class="tooltip">
+        {{ "CANVAS.TOOLTIP.UNDO" | translate }}
+      </div>
+    </div>
+
+    <div class="button-wrapper">
+      <button
+        class="redo-btn"
+        (click)="redo()"
+        [class.disabled]="!canRedo"
+        (mouseenter)="hoveredButton = 'redo'"
+        (mouseleave)="hoveredButton = null"
+      ></button>
+      <div *ngIf="hoveredButton === 'redo'" class="tooltip">
+        {{ "CANVAS.TOOLTIP.REDO" | translate }}
+      </div>
+    </div>
+
+    <div class="button-wrapper">
+      <button
+        class="conditions-btn"
+        (click)="openConditionsModal()"
+        (mouseenter)="hoveredButton = 'conditions'"
+        (mouseleave)="hoveredButton = null"
+      >
+        <span class="conditions-badge" *ngIf="conditionsCount > 0">{{ conditionsCount }}</span>
+      </button>
+      <div *ngIf="hoveredButton === 'conditions'" class="tooltip">
+        {{ "CANVAS.CONDITIONS.TITLE" | translate }}
+      </div>
+    </div>
   </div>
 
   <div
@@ -163,7 +192,6 @@
       (mouseleave)="hoveredButton = null"
     >
       <button
-        *ngFor="let tool of angleTools"
         class="figure-action-btn"
         [ngStyle]="{
           'background-image': 'url(assets/icons/' + tool.icon + ')'
@@ -193,7 +221,7 @@
   <angle-input
     class="angle-input"
     *ngIf="isAngleInputVisible && selectedAngle"
-    [initialValue]="60"
+    [initialValue]="selectedAngleValue"
     (confirm)="onAngleConfirm($event)"
   ></angle-input>
 
@@ -296,7 +324,209 @@
     </div>
   </div>
 
-  <button class="submit-task-btn" *ngIf="hasFigures" (click)="onSubmitTask()">
+  <button class="submit-task-btn" *ngIf="hasFigures || hasTextProblem" (click)="onSubmitTask()">
     {{ "CANVAS.TASK.BUTTON.SOLVE" | translate }}
   </button>
+
+  <div *ngIf="showConditionsModal" class="conditions-modal-overlay">
+    <div class="conditions-modal-box">
+      <div class="modal-header">
+        <h2>{{ "CANVAS.CONDITIONS.TITLE" | translate }}</h2>
+        <button
+          class="close-modal-btn"
+          (click)="closeConditionsModal()"
+          [title]="'CANVAS.CONDITIONS.CLOSE' | translate"
+          [attr.aria-label]="'CANVAS.CONDITIONS.CLOSE' | translate"
+        >✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Problem Statement section -->
+        <div class="condition-section">
+          <h3>{{ "CANVAS.CONDITIONS.PROBLEM_SECTION" | translate }}</h3>
+          <p class="section-hint">{{ "CANVAS.CONDITIONS.PROBLEM_HINT" | translate }}</p>
+          <div class="problem-input-row">
+            <textarea
+              [(ngModel)]="problemInputText"
+              [placeholder]="'CANVAS.CONDITIONS.PROBLEM_PLACEHOLDER' | translate"
+              [attr.aria-label]="'CANVAS.CONDITIONS.PROBLEM_SECTION' | translate"
+              class="condition-input"
+              rows="3"
+            ></textarea>
+            <div class="action-buttons-col">
+              <button
+                class="action-btn save-btn"
+                (click)="saveProblem()"
+                [attr.aria-label]="'CANVAS.CONDITIONS.SAVE_PROBLEM' | translate"
+              >
+                {{ "CANVAS.CONDITIONS.SAVE_PROBLEM" | translate }}
+              </button>
+              <button
+                class="action-btn clear-btn"
+                *ngIf="problemInputText"
+                (click)="clearProblem()"
+                [attr.aria-label]="'CANVAS.CONDITIONS.CLEAR_PROBLEM' | translate"
+              >
+                {{ "CANVAS.CONDITIONS.CLEAR_PROBLEM" | translate }}
+              </button>
+            </div>
+          </div>
+          <div class="current-target-display" *ngIf="conditionsService.getProblem()">
+            <span class="label">{{ "CANVAS.CONDITIONS.CURRENT_PROBLEM" | translate }}:</span>
+            <span class="value">{{ conditionsService.getProblem() }}</span>
+          </div>
+        </div>
+
+        <!-- Target / What to find section -->
+        <div class="condition-section">
+          <h3>{{ "CANVAS.CONDITIONS.TARGET_SECTION" | translate }}</h3>
+          <p class="section-hint">{{ "CANVAS.CONDITIONS.TARGET_HINT" | translate }}</p>
+          <div class="target-input-row">
+            <input
+              type="text"
+              [(ngModel)]="targetInputText"
+              (keydown.enter)="saveTarget()"
+              [placeholder]="'CANVAS.CONDITIONS.TARGET_PLACEHOLDER' | translate"
+              [attr.aria-label]="'CANVAS.CONDITIONS.TARGET_SECTION' | translate"
+              class="condition-input"
+            />
+            <button
+              class="action-btn save-btn"
+              (click)="saveTarget()"
+              [attr.aria-label]="'CANVAS.CONDITIONS.SAVE_TARGET' | translate"
+            >
+              {{ "CANVAS.CONDITIONS.SAVE_TARGET" | translate }}
+            </button>
+            <button
+              class="action-btn clear-btn"
+              *ngIf="targetInputText"
+              (click)="clearTarget()"
+              [attr.aria-label]="'CANVAS.CONDITIONS.CLEAR_TARGET' | translate"
+            >
+              {{ "CANVAS.CONDITIONS.CLEAR_TARGET" | translate }}
+            </button>
+          </div>
+          <div class="current-target-display" *ngIf="conditionsService.getTarget()">
+            <span class="label">{{ "CANVAS.CONDITIONS.CURRENT_TARGET" | translate }}:</span>
+            <span class="value">{{ conditionsService.getTarget() }}</span>
+          </div>
+        </div>
+
+        <!-- Additional Conditions section -->
+        <div class="condition-section">
+          <h3>{{ "CANVAS.CONDITIONS.ADDITIONAL_SECTION" | translate }}</h3>
+          <p class="section-hint">{{ "CANVAS.CONDITIONS.ADDITIONAL_HINT" | translate }}</p>
+          <div class="condition-input-row">
+            <input
+              type="text"
+              [(ngModel)]="newConditionText"
+              (keydown.enter)="addAdditionalCondition()"
+              [placeholder]="'CANVAS.CONDITIONS.ADDITIONAL_PLACEHOLDER' | translate"
+              [attr.aria-label]="'CANVAS.CONDITIONS.ADDITIONAL_SECTION' | translate"
+              class="condition-input"
+            />
+            <button
+              class="action-btn add-btn"
+              (click)="addAdditionalCondition()"
+              [attr.aria-label]="'CANVAS.CONDITIONS.ADD_BUTTON' | translate"
+            >
+              {{ "CANVAS.CONDITIONS.ADD_BUTTON" | translate }}
+            </button>
+          </div>
+
+          <div class="conditions-list" *ngIf="conditionsService.getConditions().length > 0; else noConditions">
+            <div
+              class="condition-item"
+              *ngFor="let cond of conditionsService.getConditions(); let i = index"
+            >
+              <div *ngIf="editingConditionIndex !== i" class="condition-view">
+                <span class="condition-text">{{ i + 1 }}. {{ cond }}</span>
+                <div class="condition-item-actions">
+                  <button
+                    class="item-btn edit-btn"
+                    (click)="startEditCondition(i, cond)"
+                    [title]="'CANVAS.CONDITIONS.EDIT_BUTTON' | translate"
+                    [attr.aria-label]="'CANVAS.CONDITIONS.EDIT_BUTTON' | translate"
+                  >✎</button>
+                  <button
+                    class="item-btn delete-btn"
+                    (click)="deleteAdditionalCondition(i)"
+                    [title]="'CANVAS.CONDITIONS.DELETE_BUTTON' | translate"
+                    [attr.aria-label]="'CANVAS.CONDITIONS.DELETE_BUTTON' | translate"
+                  >🗑</button>
+                </div>
+              </div>
+
+              <div *ngIf="editingConditionIndex === i" class="condition-edit-row">
+                <input
+                  type="text"
+                  [(ngModel)]="editingConditionText"
+                  (keydown.enter)="saveEditCondition(i)"
+                  [attr.aria-label]="'CANVAS.CONDITIONS.EDIT_BUTTON' | translate"
+                  class="condition-input inline-edit"
+                />
+                <button
+                  class="action-btn save-btn small"
+                  (click)="saveEditCondition(i)"
+                  [title]="'CANVAS.CONDITIONS.SAVE_EDIT' | translate"
+                  [attr.aria-label]="'CANVAS.CONDITIONS.SAVE_EDIT' | translate"
+                >✔</button>
+                <button
+                  class="action-btn cancel-btn small"
+                  (click)="cancelEditCondition()"
+                  [title]="'CANVAS.CONDITIONS.CANCEL_EDIT' | translate"
+                  [attr.aria-label]="'CANVAS.CONDITIONS.CANCEL_EDIT' | translate"
+                >✕</button>
+              </div>
+            </div>
+          </div>
+          <ng-template #noConditions>
+            <div class="empty-state">{{ "CANVAS.CONDITIONS.NO_CONDITIONS" | translate }}</div>
+          </ng-template>
+        </div>
+
+        <!-- Figure Properties Overview -->
+        <div class="condition-section figure-properties-section">
+          <h3>{{ "CANVAS.CONDITIONS.FIGURE_CONSTRAINTS" | translate }}</h3>
+          <p class="section-hint">{{ "CANVAS.CONDITIONS.FIGURE_CONSTRAINTS_HINT" | translate }}</p>
+          
+          <div class="figure-summary-grid">
+            <div class="summary-card">
+              <h4>{{ "CANVAS.CONDITIONS.LINES_SUMMARY" | translate }}</h4>
+              <ul *ngIf="getFigureLinesList().length > 0; else noLinesSummary">
+                <li *ngFor="let item of getFigureLinesList()">
+                  <strong>{{ item.line }}</strong> = {{ item.length }}
+                </li>
+              </ul>
+              <ng-template #noLinesSummary>
+                <span class="empty-text">{{ "CANVAS.CONDITIONS.NO_LINE_CONSTRAINTS" | translate }}</span>
+              </ng-template>
+            </div>
+
+            <div class="summary-card">
+              <h4>{{ "CANVAS.CONDITIONS.ANGLES_SUMMARY" | translate }}</h4>
+              <ul *ngIf="getFigureAnglesList().length > 0; else noAnglesSummary">
+                <li *ngFor="let item of getFigureAnglesList()">
+                  <strong>∠{{ item.angle }}</strong> = {{ item.value }}°
+                </li>
+              </ul>
+              <ng-template #noAnglesSummary>
+                <span class="empty-text">{{ "CANVAS.CONDITIONS.NO_ANGLE_CONSTRAINTS" | translate }}</span>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          class="done-btn"
+          (click)="closeConditionsModal()"
+          [attr.aria-label]="'CANVAS.CONDITIONS.DONE' | translate"
+        >
+          {{ "CANVAS.CONDITIONS.DONE" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

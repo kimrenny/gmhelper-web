@@ -6,6 +6,16 @@
       gap: 5px;
     }
 
+    .canvas-controls {
+      top: 50px;
+      gap: 5px;
+
+      button {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
     .tool-buttons {
       width: 30px;
       left: 10px;

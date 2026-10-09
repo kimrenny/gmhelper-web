@@ -27,67 +27,23 @@ export class LinesService implements LinesServiceInterface {
 
     if (!p1 || !p2) return;
 
-    const figureName = p1.attachedToFigure || p2.attachedToFigure;
-    if (!figureName) {
-      this.setLine(point1 + point2, length);
-      return;
+    const lineName1 = point1 + point2;
+    const lineName2 = point2 + point1;
+
+    if (this.lines[lineName1] !== undefined) {
+      this.lines[lineName1] = length;
+    } else if (this.lines[lineName2] !== undefined) {
+      this.lines[lineName2] = length;
+    } else {
+      this.lines[lineName1] = length;
     }
+  }
 
-    const lineName = point1 + point2;
-
-    const figureType = figureName.toLowerCase().split('_')[0];
-
-    if (figureType === 'polygon') {
-      this.setPolygonLinesLength(p1, length);
-      return;
-    }
-
-    if (figureType === 'rhombus') {
-      const lines = this.getLinesByFigureName(figureName);
-      lines.forEach((line) => {
-        if (line.name in this.lines) {
-          this.lines[line.name] = length;
-        }
-      });
-      return;
-    }
-
-    if (figureType.includes('rectangle')) {
-      const points = this.pointsService.getPointsByFigure(figureName);
-      const sides = [
-        this.calculateDistance(points[0], points[1]),
-        this.calculateDistance(points[1], points[2]),
-        this.calculateDistance(points[2], points[3]),
-        this.calculateDistance(points[3], points[0]),
-      ];
-
-      if (this.areLengthsEqual(sides)) {
-        const lines = this.getLinesByFigureName(figureName);
-        lines.forEach((line) => this.setLine(line.name, length));
-      } else {
-        if (lineName in this.lines) {
-          this.lines[lineName] = length;
-        }
-        const lines = this.getLinesByFigureName(figureName);
-        const parallel = this.getParallelLine({ a: p1, b: p2 }, lines);
-        if (parallel) this.setLine(parallel.name, length);
-      }
-      return;
-    }
-
-    if (figureType.includes('parallelogram')) {
-      if (lineName in this.lines) {
-        this.lines[lineName] = length;
-      }
-      const lines = this.getLinesByFigureName(figureName);
-      const parallel = this.getParallelLine({ a: p1, b: p2 }, lines);
-      if (parallel) this.setLine(parallel.name, length);
-      return;
-    }
-
-    if (lineName in this.lines) {
-      this.lines[lineName] = length;
-    }
+  deleteLineLength(point1: string, point2: string): void {
+    const lineName1 = point1 + point2;
+    const lineName2 = point2 + point1;
+    delete this.lines[lineName1];
+    delete this.lines[lineName2];
   }
 
   setPolygonLinesLength(point: Point, length: LineLength): void {
@@ -194,7 +150,7 @@ export class LinesService implements LinesServiceInterface {
   }
 
   getLineLength(a: string, b: string): LineLength {
-    return this.lines[`${a}${b}`] ?? this.lines[`${b}${a}`];
+    return this.lines[`${a}${b}`] ?? this.lines[`${b}${a}`] ?? null;
   }
 
   findLineByPoint(pos: { x: number; y: number }): {

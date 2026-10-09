@@ -16,5 +16,8 @@ export interface AnglesServiceInterface {
     attachedToPoint: number;
   } | null;
 
+  deleteAngle(label: string): void;
+
   clearAllAngles(): void;
 }
+

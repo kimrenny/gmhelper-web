@@ -11,6 +11,7 @@ export class LanguageService {
   constructor(private translate: TranslateService, private store: Store) {}
 
   initializeLanguage(): void {
+    this.translate.setDefaultLang('en');
     this.store
       .select(UserSelectors.selectUser)
       .pipe(first((user) => !!user))
@@ -18,6 +19,14 @@ export class LanguageService {
         const language = user.language.toLowerCase();
         this.translate.use(this.isLanguageCode(language) ? language : 'en');
       });
+  }
+
+  getCurrentLanguage(): LanguageCode {
+    const current = this.translate.currentLang || this.translate.defaultLang;
+    if (current && this.isLanguageCode(current.toLowerCase())) {
+      return current.toLowerCase() as LanguageCode;
+    }
+    return 'en';
   }
 
   updateLanguageFromUser(userLang: string): boolean {

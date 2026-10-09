@@ -4,6 +4,7 @@ import { StackService } from './stack.service';
 import { AnglesService } from './angles.service';
 import { FigureElementsService } from './figure-elements.service';
 import { LinesService } from './lines.service';
+import { ConditionsService } from './conditions.service';
 import {
   BehaviorSubject,
   catchError,
@@ -18,6 +19,7 @@ import { ApiResponse } from 'src/app/models/api-response.model';
 import { CanvasServiceInterface } from '../../interfaces/canvas-service.interface';
 import { environment } from 'src/environments/environment';
 import { TokenService } from 'src/app/services/token.service';
+import { LanguageService } from 'src/app/services/language.service';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +43,9 @@ export class CanvasService implements CanvasServiceInterface {
     private anglesService: AnglesService,
     private figureElementsService: FigureElementsService,
     private linesService: LinesService,
-    private tokenService: TokenService
+    private conditionsService: ConditionsService,
+    private tokenService: TokenService,
+    private languageService: LanguageService
   ) {
     this.stackService.pathsChanged$.subscribe(() => {
       const paths = this.stackService.getPaths();
@@ -94,7 +98,8 @@ export class CanvasService implements CanvasServiceInterface {
     const lines = this.linesService.getAllLines();
 
     for (const item of paths) {
-      const figureName = item.figureName!;
+      if (!item.figureName || item.path.length === 0) continue;
+      const figureName = item.figureName;
       const baseName = figureName.split('_')[0];
 
       if (!exportData[figureName]) {
@@ -178,6 +183,26 @@ export class CanvasService implements CanvasServiceInterface {
       }
 
       exportData[figureName].points = figurePoints;
+    }
+
+    const problem = this.conditionsService.getProblem();
+    if (problem) {
+      exportData['problem'] = problem;
+    }
+
+    const conditions = this.conditionsService.getConditions();
+    if (conditions && conditions.length > 0) {
+      exportData['additionalConditions'] = conditions;
+    }
+
+    const target = this.conditionsService.getTarget();
+    if (target) {
+      exportData['target'] = target;
+    }
+
+    const language = this.languageService.getCurrentLanguage();
+    if (language) {
+      exportData['language'] = language;
     }
 
     return exportData;

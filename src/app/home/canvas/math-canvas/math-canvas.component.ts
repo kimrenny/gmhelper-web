@@ -27,7 +27,6 @@ import { replacePlaceholder } from '../utils/latex-tree.utils';
 import { hasPlaceholders } from '../utils/latex-placeholders.utils';
 import { ToastrService } from 'ngx-toastr';
 import {
-  fixNestedPowers,
   parseLatexToNodes,
 } from '../utils/latex-parser.utils';
 import { PlaceholderIdService } from '../services/math-canvas/placeholderId.service';
@@ -204,6 +203,8 @@ export class MathCanvasComponent implements OnInit, OnDestroy, AfterViewInit {
         } else if (node.type === 'integral') {
           if (node.integrand && tryAppend(node.integrand)) return true;
         } else if (node.type === 'lim') {
+          if (node.variable && tryAppend(node.variable)) return true;
+          if (node.approach && tryAppend(node.approach)) return true;
           if (node.expr && tryAppend(node.expr)) return true;
         } else if (node.type === 'matrix' || node.type === 'system') {
           for (const row of node.rows) {
@@ -310,13 +311,11 @@ export class MathCanvasComponent implements OnInit, OnDestroy, AfterViewInit {
     const wrapped = wrapAligned(input);
 
     try {
-      const fixedLatex = fixNestedPowers(wrapped);
-
-      if (!isLatexValid(fixedLatex)) {
+      if (!isLatexValid(wrapped)) {
         if (input.length > 0) return;
       }
 
-      this.latexTree = parseLatexToNodes(unwrapAligned(fixedLatex));
+      this.latexTree = parseLatexToNodes(unwrapAligned(wrapped));
 
       this.renderLatexOnCanvas(true, false, true);
 
@@ -337,9 +336,7 @@ export class MathCanvasComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.lastInvalidInput !== this.latexInput.trim()) return;
 
         try {
-          const autofixed = fixNestedPowers(wrapped);
-
-          this.latexTree = parseLatexToNodes(unwrapAligned(autofixed));
+          this.latexTree = parseLatexToNodes(unwrapAligned(wrapped));
 
           this.renderLatexOnCanvas();
         } catch (e2) {

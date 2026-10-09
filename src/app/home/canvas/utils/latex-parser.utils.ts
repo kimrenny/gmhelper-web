@@ -22,24 +22,32 @@ export function generateLatex(nodes: LatexNode[]): string {
           )}}`;
         case 'integral':
           return `\\int ${generateLatex(node.integrand ?? [])} \\, dx`;
-        case 'lim':
-          return `\\lim_{x \\to \\infty} ${generateLatex(node.expr ?? [])}`;
+        case 'lim': {
+          const v = generateLatex(
+            node.variable && node.variable.length
+              ? node.variable
+              : [{ type: 'text', value: 'x' }]
+          );
+          const a = generateLatex(
+            node.approach && node.approach.length
+              ? node.approach
+              : [{ type: 'text', value: '\\infty' }]
+          );
+          const expr = generateLatex(node.expr ?? []);
+          return `\\lim_{${v} \\to ${a}} ${expr}`;
+        }
         case 'matrix': {
           const rowsLatex = (node.rows ?? [])
             .map((row) => row.map((cell) => generateLatex([cell])).join(' & '))
             .join(' \\\\ ');
           return `\\begin{bmatrix} ${rowsLatex} \\end{bmatrix}`;
         }
-        /* disabled */
-        // case 'system': {
-        //   const cols = Math.max(1, ...(node.rows ?? []).map((r) => r.length));
-        //   const colSpec = 'l'.repeat(cols);
-
-        //   const rowsLatex = (node.rows ?? [])
-        //     .map((row) => row.map((cell) => generateLatex([cell])).join(' & '))
-        //     .join(' \\\\ ');
-        //   return `\\left\\{\\begin{array}{${colSpec}} ${rowsLatex} \\end{array}\\right.`;
-        // }
+        case 'system': {
+          const rowsLatex = (node.rows ?? [])
+            .map((row) => generateLatex(row))
+            .join(' \\\\ ');
+          return `\\begin{cases} ${rowsLatex} \\end{cases}`;
+        }
         case 'placeholder':
           return `\\htmlClass{placeholder}{\\htmlStyle{border:2px solid black; padding:2px; display:inline-block;}{?}}`;
         default:
@@ -82,7 +90,7 @@ export function latexNodesToLatex(
             node.exponent && node.exponent.length
               ? latexNodesToLatex(node.exponent, selectedId)
               : '';
-          return `${base}^{${exponent}}`;
+          return `{${base}}^{${exponent}}`;
         }
 
         case 'sqrt': {
@@ -114,11 +122,19 @@ export function latexNodesToLatex(
         }
 
         case 'lim': {
+          const v =
+            node.variable && node.variable.length
+              ? latexNodesToLatex(node.variable, selectedId)
+              : 'x';
+          const a =
+            node.approach && node.approach.length
+              ? latexNodesToLatex(node.approach, selectedId)
+              : '\\infty';
           const expr =
             node.expr && node.expr.length
               ? latexNodesToLatex(node.expr, selectedId)
               : '';
-          return `\\lim_{x \\to \\infty} ${expr}`;
+          return `\\lim_{{${v}} \\to {${a}}} ${expr}`;
         }
 
         case 'matrix': {
@@ -133,18 +149,13 @@ export function latexNodesToLatex(
           return `\\begin{bmatrix} ${rowsLatex} \\end{bmatrix}`;
         }
 
-        /* disabled */
-        // case 'system': {
-        //   if (!node.rows || !node.rows.length) return '';
-        //   const systemRows = node.rows
-        //     .map((row) =>
-        //       row
-        //         .map((cell) => latexNodesToLatex([cell], selectedId))
-        //         .join(' & ')
-        //     )
-        //     .join(' \\\\ ');
-        //   return `\\left\\{\\begin{array}{} ${systemRows} \\end{array}\\right.`;
-        // }
+        case 'system': {
+          if (!node.rows || !node.rows.length) return '';
+          const rowsLatex = node.rows
+            .map((row) => latexNodesToLatex(row, selectedId))
+            .join(' \\\\ ');
+          return `\\begin{cases} ${rowsLatex} \\end{cases}`;
+        }
 
         case 'placeholder': {
           const classes = ['placeholder'];
@@ -163,19 +174,6 @@ export function latexNodesToLatex(
       }
     })
     .join('');
-}
-
-export function fixNestedPowers(latex: string): string {
-  return latex.replace(/(\^(\{[^}]*\}|[^{}\^])){2,}/g, (match) => {
-    const parts =
-      match
-        .match(/\^{([^}]*)}|(\^[^\{\}])/g)
-        ?.map((part) => part.replace(/^\^(\{)?|(\})?$/g, '')) || [];
-
-    const combined = parts.join('');
-
-    return `^{${combined}}`;
-  });
 }
 
 export function parseLatexToNodes(input: string): LatexNode[] {
@@ -269,17 +267,52 @@ export function parseLatexToNodes(input: string): LatexNode[] {
     if (input.startsWith('\\lim', i)) {
       i += 4;
       skipSpaces();
+      let variable: LatexNode[] | undefined;
+      let approach: LatexNode[] | undefined;
+
       if (input[i] === '_') {
         i++;
         skipSpaces();
+        let subStr = '';
         if (input[i] === '{') {
-          parseGroup();
+          i++;
+          let depth = 1;
+          while (i < input.length && depth > 0) {
+            if (input[i] === '{') depth++;
+            else if (input[i] === '}') depth--;
+            if (depth > 0) subStr += input[i];
+            i++;
+          }
         } else {
-          parseOneTokenAsNodes();
+          while (
+            i < input.length &&
+            !/\s/.test(input[i]) &&
+            input[i] !== '{' &&
+            input[i] !== '\\' &&
+            input[i] !== '^'
+          ) {
+            subStr += input[i++];
+          }
+        }
+
+        const toMatch = subStr.match(/(.*?)(?:\\to|\\rightarrow)(.*)/);
+        if (toMatch) {
+          const varPart = toMatch[1].trim();
+          const approachPart = toMatch[2].trim();
+          variable = varPart
+            ? parseLatexToNodes(varPart)
+            : [{ type: 'text', value: 'x' }];
+          approach = approachPart
+            ? parseLatexToNodes(approachPart)
+            : [{ type: 'text', value: '\\infty' }];
+        } else if (subStr.trim()) {
+          variable = parseLatexToNodes(subStr.trim());
         }
       }
+
+      skipSpaces();
       const expr = parseLatexToNodes(input.slice(i));
-      nodes.push({ type: 'lim', expr });
+      nodes.push({ type: 'lim', variable, approach, expr });
       break;
     }
 
@@ -314,24 +347,29 @@ export function parseLatexToNodes(input: string): LatexNode[] {
       continue;
     }
 
-    /* disabled */
-    // if (input.startsWith('\\left\\{\\begin{array}', i)) {
-    //   const endSig = '\\end{array}\\right.';
-    //   const endIdx = input.indexOf(endSig, i);
-    //   const content = endIdx >= 0 ? input.slice(i, endIdx) : '';
-    //   i = endIdx >= 0 ? endIdx + endSig.length : input.length;
-    //   const innerStart = content.indexOf('}');
-    //   const inner = innerStart >= 0 ? content.slice(innerStart + 1) : '';
-    //   const rowsStr = inner.split('\\\\');
-    //   const rows = rowsStr.map((r) =>
-    //     r
-    //       .split('&')
-    //       .map((cell) => parseLatexToNodes(cell.trim()) as unknown as LatexNode)
-    //       .flat()
-    //   );
-    //   nodes.push({ type: 'system', rows });
-    //   continue;
-    // }
+    if (input.startsWith('\\begin{cases}', i)) {
+      const start = i + '\\begin{cases}'.length;
+      const endIdx = input.indexOf('\\end{cases}', start);
+      const content = endIdx >= 0 ? input.slice(start, endIdx) : '';
+      i = endIdx >= 0 ? endIdx + '\\end{cases}'.length : input.length;
+      const rowsStr = content.split('\\\\');
+      const rows = rowsStr.map((r) => parseLatexToNodes(r.trim()));
+      nodes.push({ type: 'system', rows });
+      continue;
+    }
+
+    if (input.startsWith('\\left\\{\\begin{array}', i)) {
+      const endSig = '\\end{array}\\right.';
+      const endIdx = input.indexOf(endSig, i);
+      const content = endIdx >= 0 ? input.slice(i, endIdx) : '';
+      i = endIdx >= 0 ? endIdx + endSig.length : input.length;
+      const innerStart = content.indexOf('}');
+      const inner = innerStart >= 0 ? content.slice(innerStart + 1) : '';
+      const rowsStr = inner.split('\\\\');
+      const rows = rowsStr.map((r) => parseLatexToNodes(r.trim()));
+      nodes.push({ type: 'system', rows });
+      continue;
+    }
 
     if (input[i] === '\\') {
       let cmd = '\\';

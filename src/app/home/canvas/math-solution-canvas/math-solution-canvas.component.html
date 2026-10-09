@@ -3,7 +3,51 @@
 
   <div class="canvas-wrapper">
     <div #mathSolutionDiv class="canvas" [class.blurred]="taskProcessing">
-      <div class="solution-katex-wrapper"></div>
+      <div class="solution-content-wrapper" *ngIf="!taskProcessing">
+        <!-- Problem header if available -->
+        <div class="solution-card problem-card" *ngIf="problemLatex || problemText">
+          <div class="card-header">
+            <span class="card-badge problem-badge">{{ "CANVAS.SOLUTION.PROBLEM" | translate }}</span>
+          </div>
+          <div class="card-body">
+            <div class="problem-katex formula-wrapper" *ngIf="problemLatex"></div>
+            <p class="problem-text" *ngIf="problemText && !problemLatex">{{ problemText }}</p>
+          </div>
+        </div>
+
+        <!-- Structured Steps -->
+        <div class="solution-steps-list" *ngIf="displaySteps.length > 0">
+          <div class="solution-step-card" *ngFor="let step of displaySteps; let i = index">
+            <div class="step-header">
+              <span class="step-badge">{{ "CANVAS.SOLUTION.STEP" | translate }} {{ step.stepNumber || (i + 1) }}</span>
+              <span class="step-title" *ngIf="step.title">{{ step.title }}</span>
+            </div>
+            <p class="step-explanation" *ngIf="step.explanation">{{ step.explanation }}</p>
+            <div class="step-formula-katex formula-wrapper" *ngIf="step.latexFormula" [attr.data-latex]="step.latexFormula"></div>
+          </div>
+        </div>
+
+        <!-- Fallback lines if no structured steps -->
+        <div class="solution-steps-list" *ngIf="displaySteps.length === 0 && fallbackLines.length > 0">
+          <div class="solution-step-card" *ngFor="let line of fallbackLines; let i = index">
+            <div class="step-header" *ngIf="fallbackLines.length > 1">
+              <span class="step-badge">{{ "CANVAS.SOLUTION.STEP" | translate }} {{ i + 1 }}</span>
+            </div>
+            <div class="step-formula-katex formula-wrapper" [attr.data-latex]="line"></div>
+          </div>
+        </div>
+
+        <!-- Final Answer -->
+        <div class="solution-card final-answer-card" *ngIf="finalAnswerLatex || finalAnswerText">
+          <div class="card-header">
+            <span class="card-badge final-badge">{{ "CANVAS.SOLUTION.FINAL_ANSWER" | translate }}</span>
+          </div>
+          <div class="card-body">
+            <div class="final-answer-katex formula-wrapper" *ngIf="finalAnswerLatex"></div>
+            <p class="final-answer-text" *ngIf="finalAnswerText && !finalAnswerLatex">{{ finalAnswerText }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

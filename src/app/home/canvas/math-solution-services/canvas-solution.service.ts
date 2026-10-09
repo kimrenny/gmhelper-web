@@ -19,6 +19,24 @@ import { environment } from 'src/environments/environment';
 import { TokenService } from 'src/app/services/token.service';
 import { CanvasService } from '../services/math-canvas/canvas.service';
 
+export interface MathSolutionStep {
+  stepNumber?: number;
+  title?: string;
+  explanation?: string;
+  latexFormula?: string;
+}
+
+export interface MathSolutionData {
+  problemType?: string;
+  status?: string;
+  problem?: string;
+  latexProblem?: string;
+  steps?: MathSolutionStep[];
+  finalAnswer?: string;
+  latexAnswer?: string;
+  compositeLatex?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -29,6 +47,7 @@ export class MathCanvasSolutionService {
   taskId$ = this.canvasService.taskId$;
 
   private latexSolution: string = '';
+  private solutionData: MathSolutionData | null = null;
 
   constructor(
     private canvasService: CanvasService,
@@ -38,8 +57,9 @@ export class MathCanvasSolutionService {
   public getTaskFromApi(id: string): Observable<boolean> {
     return this.http.get<ApiResponse<any>>(`${this.api}/tasks/math/${id}`).pipe(
       tap((res) => {
-        if (res.success) {
-          this.latexSolution = res.data.data;
+        if (res.success && res.data) {
+          this.latexSolution = res.data.data || '';
+          this.solutionData = res.data.solution || null;
         } else {
           console.warn('Server rejected request:', res.message);
         }
@@ -54,6 +74,10 @@ export class MathCanvasSolutionService {
 
   getLatexSolution(): string {
     return this.latexSolution;
+  }
+
+  getSolutionData(): MathSolutionData | null {
+    return this.solutionData;
   }
 
   rateSolution(isCorrect: boolean): Observable<any> {

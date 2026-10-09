@@ -31,7 +31,7 @@ export class AnglesService implements AnglesServiceInterface {
   }
 
   getAngleValue(label: string): LineLength {
-    return this.angles[label];
+    return this.angles[label] ?? null;
   }
 
   findAngleByPoint(pos: { x: number; y: number }): {
@@ -43,7 +43,7 @@ export class AnglesService implements AnglesServiceInterface {
       const dx = point.x - pos.x;
       const dy = point.y - pos.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance <= 10 && this.angles[point.label]) {
+      if (distance <= 15 && point.label) {
         return {
           label: point.label,
           attachedToFigure: point.attachedToFigure,
@@ -52,6 +52,10 @@ export class AnglesService implements AnglesServiceInterface {
       }
     }
     return null;
+  }
+
+  deleteAngle(label: string): void {
+    delete this.angles[label];
   }
 
   clearAllAngles(): void {
